@@ -12,4 +12,8 @@ class ProductCategoryController extends Controller
 
         return view('productcategory.index', ['productcategories' => $productcategories]);
     }
+
+    public function create() {
+        return view('productcategory.create');
+    }
 }

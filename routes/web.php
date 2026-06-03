@@ -22,5 +22,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/productcategory', [ProductCategoryController::class, 'index'])->name('productcategory.index');
+Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
 
 require __DIR__.'/auth.php';
