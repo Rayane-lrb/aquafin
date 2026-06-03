@@ -36,4 +36,16 @@ class ProductCategoryController extends Controller
         return view('productcategory.edit', ['productcategory' => $productCategory]);
     }
 
+    public function update(Request $request, string $id) {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255']
+        ]);
+
+        $productCategory = ProductCategory::findOrFail($id);
+        $productCategory->update([
+            'name' => $request->name
+            ]);
+        return redirect()->route('productcategory.index');
+    }
+
 }

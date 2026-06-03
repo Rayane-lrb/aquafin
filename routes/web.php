@@ -25,5 +25,6 @@ Route::get('/productcategory', [ProductCategoryController::class, 'index'])->nam
 Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
 Route::post('/productcategory', [ProductCategoryController::class, 'store'])->name('productcategory.store');
 Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edit'])->name('productcategory.edit');
+Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
 
 require __DIR__.'/auth.php';
