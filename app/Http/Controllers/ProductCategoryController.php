@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 class ProductCategoryController extends Controller
 {
     public function index() {
-        $productcategories = ProductCategory::all();
+        $productCategories = ProductCategory::all();
 
-        return view('productcategory.index', ['productcategories' => $productcategories]);
+        return view('productcategory.index', ['productcategories' => $productCategories]);
     }
 
     public function create() {
@@ -29,4 +29,11 @@ class ProductCategoryController extends Controller
         return redirect()->route('productcategory.index');
 
     }
+
+    public function edit(string $id) {
+        $productCategory = ProductCategory::findOrFail($id);
+
+        return view('productcategory.edit', ['productcategory' => $productCategory]);
+    }
+
 }
