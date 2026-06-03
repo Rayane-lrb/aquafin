@@ -16,4 +16,17 @@ class ProductCategoryController extends Controller
     public function create() {
         return view('productcategory.create');
     }
+
+    public function store(Request $request) {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255']
+        ]);
+
+        ProductCategory::create(
+            ['name' => $request->name]
+        );
+
+        return redirect()->route('productcategory.index');
+
+    }
 }
