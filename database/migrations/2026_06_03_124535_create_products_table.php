@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('stock');
             $table->boolean('is_active')->default(false);
             $table->boolean('is_flood_tool')->default(false);
+            $table->foreignId('product_category_id')->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });
