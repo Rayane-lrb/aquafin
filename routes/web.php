@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,5 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/productcategory', [ProductCategoryController::class, 'index'])->name('productcategory.index');
+Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
+Route::post('/productcategory', [ProductCategoryController::class, 'store'])->name('productcategory.store');
+Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edit'])->name('productcategory.edit');
+Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
+Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
 
 require __DIR__.'/auth.php';
