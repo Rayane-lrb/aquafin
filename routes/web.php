@@ -3,6 +3,8 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\SuggestionController;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +38,13 @@ Route::post('/product', [ProductController::class, 'store'])->name('product.stor
 Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
 Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+
+
+Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order', [OrderController::class, 'store'])->name('order.store');
+Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
+Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 
 Route::resource('suggestions', SuggestionController::class);
 
