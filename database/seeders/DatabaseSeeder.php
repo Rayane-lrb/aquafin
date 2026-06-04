@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
         ProductCategory::factory(5)->create();
         Product::factory(10)->create();
+        Suggestion::factory(10)->create();
 
     }
 }
