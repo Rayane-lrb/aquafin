@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">Ajouter un produit</x-slot>
+    <x-slot name="header">Product toevoegen</x-slot>
 
     <div class="max-w-2xl">
         <div class="bg-white shadow-sm rounded-xl p-6">
@@ -7,7 +7,7 @@
                 @csrf
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Naam</label>
                     <input type="text" name="name" value="{{ old('name') }}"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -21,9 +21,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Categorie</label>
                     <select name="product_category_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Choisir --</option>
+                        <option value="">-- Kies een categorie --</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ old('product_category_id') == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
@@ -36,19 +36,19 @@
                 <div class="mb-6 flex gap-6">
                     <label class="flex items-center gap-2 text-sm text-gray-700">
                         <input type="checkbox" name="is_active" value="1" {{ old('is_active') ? 'checked' : '' }}>
-                        Actif
+                        Actief
                     </label>
                     <label class="flex items-center gap-2 text-sm text-gray-700">
                         <input type="checkbox" name="is_flood_tool" value="1" {{ old('is_flood_tool') ? 'checked' : '' }}>
-                        Outil d'inondation
+                        Overstromingsgereedschap
                     </label>
                 </div>
 
                 <div class="flex gap-3">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
-                        Enregistrer
+                        Opslaan
                     </button>
-                    <a href="{{ route('product.index') }}" class="text-sm text-gray-500 hover:underline px-3 py-2">Annuler</a>
+                    <a href="{{ route('product.index') }}" class="text-sm text-gray-500 hover:underline px-3 py-2">Annuleren</a>
                 </div>
             </form>
         </div>

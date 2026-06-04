@@ -9,7 +9,7 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Product</label>
                     <select name="product_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Choisir --</option>
+                        <option value="">-- Kies een product --</option>
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
                                 {{ $product->name }} (stock: {{ $product->stock }})
