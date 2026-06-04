@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +22,8 @@ class ProductFactory extends Factory
             'name' => $this->faker->word(),
             'stock' => $this->faker->randomDigit(),
             'is_active' => $this->faker->boolean(),
-            'is_flood_tool' => $this->faker->boolean()
+            'is_flood_tool' => $this->faker->boolean(),
+            'product_category_id' => $this->faker->numberBetween(1, ProductCategory::count()),
         ];
     }
 }

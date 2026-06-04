@@ -98,7 +98,6 @@
                 <h3 class="font-semibold text-lg">
                     {{ $product->name }}
                 </h3>
-
                 <p class="text-gray-600 mt-2">
                     Voorraad: {{ $product->stock }}
                 </p>
