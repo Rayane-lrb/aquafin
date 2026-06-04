@@ -29,5 +29,7 @@ Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edi
 Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
 Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
 
+
 Route::get('/product', [ProductController::class, 'index'])->name('product.index');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 require __DIR__.'/auth.php';
