@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'role' => 'admin',
+            'password' => bcrypt('password'),
         ]);
         ProductCategory::factory(5)->create();
         Product::factory(10)->create();

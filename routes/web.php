@@ -13,12 +13,12 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Groep met auth en verified middleware (voor alle routes die in de navigatie worden gebruikt)
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('userzone.dashboard');
-    })->name('dashboard');
+Route::get('/dashboard', function () {
+    return view('userzone.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/technieker', function (Request $request) {
+    $products = Product::query();
 
     // Technieker
     Route::get('/technieker', function (Request $request) {
@@ -41,20 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
-    // Order routes
-    Route::get('/orders', [OrderController::class, 'index'])->name('order.index');
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('order.create');
-    Route::post('/orders', [OrderController::class, 'store'])->name('order.store');
-    Route::put('/orders/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
-    Route::put('/orders/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
-
-    // Product Category routes
-    Route::get('/productcategory', [ProductCategoryController::class, 'index'])->name('productcategory.index');
-    Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
-    Route::post('/productcategory', [ProductCategoryController::class, 'store'])->name('productcategory.store');
-    Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edit'])->name('productcategory.edit');
-    Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
-    Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
+    return view('userzone.technieker', [
+        'products' => $products->get()
+    ]);
+})->middleware(['auth', 'verified'])->name('technieker');
 
     // Profile routes (bestaand)
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
@@ -62,5 +52,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Auth routes (blijft buiten de auth middleware)
+Route::get('/productcategory', [ProductCategoryController::class, 'index'])->name('productcategory.index');
+Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
+Route::post('/productcategory', [ProductCategoryController::class, 'store'])->name('productcategory.store');
+Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edit'])->name('productcategory.edit');
+Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
+Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
+
+Route::get('/product', [ProductController::class, 'index'])->name('product.index');
+Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::post('/product', [ProductController::class, 'store'])->name('product.store');
+Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
+Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
+Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+
+Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order', [OrderController::class, 'store'])->name('order.store');
+Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
+Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
+
 require __DIR__.'/auth.php';
