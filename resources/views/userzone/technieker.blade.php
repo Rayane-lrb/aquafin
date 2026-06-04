@@ -80,7 +80,6 @@
     </div>
 </div>
 
-<!-- Overlay (donker scherm) -->
 <div id="cartOverlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
 <!-- Winkelwagen Panel (initieel buiten scherm) -->
