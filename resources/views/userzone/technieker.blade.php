@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aquafin Dashboard</title>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100">
@@ -16,6 +17,7 @@
         </h1>
 
         <div class="flex gap-3">
+
             <button
                 id="openCartBtn"
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
@@ -43,18 +45,23 @@
         </h2>
 
         <div class="flex flex-wrap gap-3">
+
             <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
                 PVC Buis 50mm
             </button>
+
             <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
                 Koppeling 90°
             </button>
+
             <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
                 Afsluitkraan
             </button>
+
             <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
                 Watermeter
             </button>
+
         </div>
     </div>
 
@@ -64,13 +71,16 @@
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
             <div class="bg-white p-5 rounded-xl shadow">
                 <h3 class="font-semibold text-lg">
                     PVC Buis 50mm
                 </h3>
+
                 <p class="text-gray-600 mt-2">
                     Voorraad: 120
                 </p>
+
                 <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                     Toevoegen
                 </button>
@@ -80,9 +90,11 @@
                 <h3 class="font-semibold text-lg">
                     Koppeling 90°
                 </h3>
+
                 <p class="text-gray-600 mt-2">
                     Voorraad: 75
                 </p>
+
                 <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                     Toevoegen
                 </button>
@@ -92,13 +104,16 @@
                 <h3 class="font-semibold text-lg">
                     Afsluitkraan
                 </h3>
+
                 <p class="text-gray-600 mt-2">
                     Voorraad: 42
                 </p>
+
                 <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                     Toevoegen
                 </button>
             </div>
+
         </div>
     </div>
 
@@ -108,57 +123,84 @@
             Vorige bestellingen bekijken
         </button>
     </div>
+
 </div>
 
-<!-- Overlay (donker scherm) -->
-<div id="cartOverlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+<div
+    id="cartOverlay"
+    class="fixed inset-0 bg-black/40 hidden z-40">
+</div>
 
-<!-- Winkelwagen Panel (initieel buiten scherm) -->
-<div id="cartPanel" class="fixed top-0 right-0 w-96 h-screen bg-white shadow-2xl p-6 z-50
-    transform translate-x-full transition-transform duration-300 ease-in-out">
-    <button id="closeCartBtn" class="float-right text-2xl font-bold hover:text-gray-500">
+<div
+    id="cartPanel"
+    class="fixed top-0 right-[-25%] w-1/4 h-screen bg-white shadow-2xl p-6 z-50 transition-all duration-300 overflow-y-auto">
+
+    <button
+        id="closeCartBtn"
+        class="float-right text-2xl font-bold hover:text-red-500">
         ✕
     </button>
+
     <h2 class="text-2xl font-bold mb-6">
         Bestelling
     </h2>
+
     <ul class="space-y-2 mb-6">
+
         <li class="border-b pb-2">
             PVC Buis 50mm x2
         </li>
+
         <li class="border-b pb-2">
             Koppeling 90° x4
         </li>
+
     </ul>
+
     <h3 class="font-semibold mb-3">
         Leverdatum
     </h3>
-    <input type="date" class="w-full border border-gray-300 rounded-lg p-2 mb-6">
-    <button class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">
+
+    <input
+        type="date"
+        class="w-full border border-gray-300 rounded-lg p-2 mb-6">
+
+    <button
+        class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">
         Bestelling bevestigen
     </button>
+
 </div>
 
 <script>
-    const cartPanel = document.getElementById('cartPanel');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const openCartBtn = document.getElementById('openCartBtn');
-    const closeCartBtn = document.getElementById('closeCartBtn');
 
-    // Open winkelwagen
-    openCartBtn.addEventListener('click', () => {
-        cartPanel.classList.remove('translate-x-full');
-        cartOverlay.classList.remove('hidden');
-    });
+const cartPanel = document.getElementById('cartPanel');
+const cartOverlay = document.getElementById('cartOverlay');
 
-    // Sluit winkelwagen
-    function closeCart() {
-        cartPanel.classList.add('translate-x-full');
-        cartOverlay.classList.add('hidden');
-    }
+document.getElementById('openCartBtn')
+.addEventListener('click', () => {
 
-    closeCartBtn.addEventListener('click', closeCart);
-    cartOverlay.addEventListener('click', closeCart);
+    cartPanel.classList.remove('translate-x-full');
+    cartPanel.classList.add('translate-x-0');
+
+    cartOverlay.classList.remove('hidden');
+
+});
+
+document.getElementById('closeCartBtn')
+.addEventListener('click', closeCart);
+
+cartOverlay.addEventListener('click', closeCart);
+
+function closeCart() {
+
+    cartPanel.classList.remove('translate-x-0');
+    cartPanel.classList.add('translate-x-full');
+
+    cartOverlay.classList.add('hidden');
+
+}
+
 </script>
 
 </body>
