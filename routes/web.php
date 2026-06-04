@@ -56,4 +56,6 @@ Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
 Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 
+Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
+
 require __DIR__.'/auth.php';
