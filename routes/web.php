@@ -59,6 +59,6 @@ Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('or
 Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
 Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
 Route::get('/suggestion/create', [SuggestionController::class, 'create'])->('suggestion.create');
-
+Route::patch('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
 
 require __DIR__.'/auth.php';

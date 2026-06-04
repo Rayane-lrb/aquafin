@@ -21,4 +21,20 @@ class SuggestionController extends Controller
     public function create() {
         return view('suggestion.create');
     }
+
+    public function store(request $request) {
+        $request->validate([
+            'title' => 'required|string|min:5|max:255',
+            'description' => 'required|string|min:10|max:2000',
+        ]);
+
+        Suggestion::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'user_id' => auth()->id(),
+            'status'  => 'pending'
+        ]);
+        
+        return redirect()->route('suggestion.create');
+    }
 }
