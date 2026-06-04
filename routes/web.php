@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -6,7 +7,7 @@ use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
@@ -44,6 +45,5 @@ Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('prod
 Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
-Route::resource('suggestions', SuggestionController::class);
 
 require __DIR__.'/auth.php';

@@ -3,61 +3,72 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $products = Product::all();
 
         return view('product.index', ['products' => $products]);
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $product = Product::findOrFail($id);
 
         return view('product.show', ['product' => $product]);
     }
 
-    public function create() {
-        return view('product.create');
+    public function create()
+    {
+        $categories = ProductCategory::all();
+
+        return view('product.create', ['categories' => $categories]);
     }
-    
-    public function store(Request $request) {
-    $request->validate([
-        'name'                => ['required', 'string', 'max:255'],
-        'stock'               => ['required', 'integer', 'min:0'],
-        'product_category_id' => ['required', 'exists:product_categories,id'],
-    ]);
 
-    Product::create($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
+    public function edit(string $id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = ProductCategory::all();
 
-    return redirect()->route('product.index');
-}
+        return view('product.edit', ['product' => $product, 'categories' => $categories]);
+    }
 
-public function edit(string $id) {
-    $product = Product::findOrFail($id);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'product_category_id' => ['required', 'exists:product_categories,id'],
+        ]);
 
-    return view('product.edit', ['product' => $product]);
-}
+        Product::create($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
 
-public function update(Request $request, string $id) {
-    $request->validate([
-        'name'                => ['required', 'string', 'max:255'],
-        'stock'               => ['required', 'integer', 'min:0'],
-        'product_category_id' => ['required', 'exists:product_categories,id'],
-    ]);
+        return redirect()->route('product.index');
+    }
 
-    $product = Product::findOrFail($id);
-    $product->update($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'product_category_id' => ['required', 'exists:product_categories,id'],
+        ]);
 
-    return redirect()->route('product.index');
-}
+        $product = Product::findOrFail($id);
+        $product->update($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
 
-public function destroy(string $id) {
-    $product = Product::findOrFail($id);
-    $product->delete();
+        return redirect()->route('product.index');
+    }
 
-    return redirect()->route('product.index');
-}
+    public function destroy(string $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return redirect()->route('product.index');
+    }
 }
