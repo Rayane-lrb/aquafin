@@ -1,8 +1,8 @@
 <?php
-
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Userzone\SuggestionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,7 +29,6 @@ Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edi
 Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
 Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
 
-
 Route::get('/product', [ProductController::class, 'index'])->name('product.index');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
@@ -37,5 +36,7 @@ Route::post('/product', [ProductController::class, 'store'])->name('product.stor
 Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
 Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+
+Route::resource('suggestions', SuggestionController::class);
 
 require __DIR__.'/auth.php';
