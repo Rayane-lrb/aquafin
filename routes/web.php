@@ -3,6 +3,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\SuggestionController;
+use App\Models\Product;
 
 Route::get('/', function () {
     return view('welcome');
@@ -13,7 +14,13 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/technieker', function () {
-    return view('userzone.technieker');
+
+    $products = Product::all();
+
+    return view('userzone.technieker', [
+        'products' => $products
+    ]);
+
 })->middleware(['auth', 'verified'])->name('technieker');
 
 Route::middleware('auth')->group(function () {

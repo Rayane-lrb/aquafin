@@ -41,20 +41,6 @@
             Veelgebruikte materialen
         </h2>
 
-        <div class="flex flex-wrap gap-3">
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                PVC Buis 50mm
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Koppeling 90°
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Afsluitkraan
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Watermeter
-            </button>
-        </div>
     </div>
 
     <div class="mb-8">
@@ -63,41 +49,26 @@
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-lg">
-                    PVC Buis 50mm
-                </h3>
-                <p class="text-gray-600 mt-2">
-                    Voorraad: 120
-                </p>
-                <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Toevoegen
-                </button>
-            </div>
+            @foreach($products as $product)
 
             <div class="bg-white p-5 rounded-xl shadow">
+
                 <h3 class="font-semibold text-lg">
-                    Koppeling 90°
+                    {{ $product->name }}
                 </h3>
+
                 <p class="text-gray-600 mt-2">
-                    Voorraad: 75
+                    Voorraad: {{ $product->stock }}
                 </p>
-                <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+
+                <button
+                    class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                     Toevoegen
                 </button>
+
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-lg">
-                    Afsluitkraan
-                </h3>
-                <p class="text-gray-600 mt-2">
-                    Voorraad: 42
-                </p>
-                <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Toevoegen
-                </button>
-            </div>
+            @endforeach
         </div>
     </div>
 
