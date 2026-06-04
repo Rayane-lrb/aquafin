@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -54,5 +55,11 @@ Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('prod
 Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
+
+Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order', [OrderController::class, 'store'])->name('order.store');
+Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
+Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 
 require __DIR__.'/auth.php';
