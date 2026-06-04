@@ -58,7 +58,7 @@ Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('or
 
 Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
 Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
-Route::get('/suggestion/create', [SuggestionController::class, 'create'])->('suggestion.create');
+Route::get('/suggestion/create', [SuggestionController::class, 'create'])->name('suggestion.create');
 Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
 Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
 Route::patch('/suggestion/{id}/reject', [SuggestionController::class, 'reject'])->name('suggestion.reject');
