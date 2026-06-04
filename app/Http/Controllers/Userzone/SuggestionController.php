@@ -9,59 +9,100 @@ use Illuminate\Http\Request;
 
 class SuggestionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Alle suggesties ophalen
     public function index()
     {
-        //
+        $suggestions = Suggestion::with('product')->get();
+        return response()->json($suggestions);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Formulier voor nieuwe suggestie (niet nodig voor API)
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Nieuwe suggestie opslaan
     public function store(Request $request)
     {
-        //
+        // Validatie
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'reason'     => 'nullable|string|max:255',
+            'is_active'  => 'boolean',
+        ]);
+
+        // Controle of product bestaat (extra zekerheid)
+        $product = Product::find($validated['product_id']);
+        if (!$product) {
+            return response()->json([
+                'message' => 'Product niet gevonden.'
+            ], 404);
+        }
+
+        // Suggestie opslaan
+        $suggestion = Suggestion::create($validated);
+
+        return response()->json($suggestion, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Één suggestie tonen
     public function show(string $id)
     {
-        //
+        $suggestion = Suggestion::with('product')->find($id);
+
+        if (!$suggestion) {
+            return response()->json([
+                'message' => 'Suggestie niet gevonden.'
+            ], 404);
+        }
+
+        return response()->json($suggestion);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Formulier voor bewerken (niet nodig voor API)
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Suggestie aanpassen
     public function update(Request $request, string $id)
     {
-        //
+        $suggestion = Suggestion::find($id);
+
+        if (!$suggestion) {
+            return response()->json([
+                'message' => 'Suggestie niet gevonden.'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'product_id' => 'sometimes|exists:products,id',
+            'reason'     => 'nullable|string|max:255',
+            'is_active'  => 'boolean',
+        ]);
+
+        $suggestion->update($validated);
+
+        return response()->json($suggestion);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Suggestie verwijderen
     public function destroy(string $id)
     {
-        //
+        $suggestion = Suggestion::find($id);
+
+        if (!$suggestion) {
+            return response()->json([
+                'message' => 'Suggestie niet gevonden.'
+            ], 404);
+        }
+
+        $suggestion->delete();
+
+        return response()->json([
+            'message' => 'Suggestie verwijderd.'
+        ]);
     }
 }
