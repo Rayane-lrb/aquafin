@@ -12,8 +12,14 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-breeze.nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-breeze.nav-link :href="route('product.index')" :active="request()->routeIs('product.*')">
+                        Produits
+                    </x-breeze.nav-link>
+                    <x-breeze.nav-link :href="route('order.index')" :active="request()->routeIs('order.*')">
+                        Commandes
+                    </x-breeze.nav-link>
+                    <x-breeze.nav-link :href="route('productcategory.index')" :active="request()->routeIs('productcategory.*')">
+                        Catégories
                     </x-breeze.nav-link>
                 </div>
             </div>
@@ -67,8 +73,14 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-breeze.responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <x-breeze.responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.*')">
+                Produits
+            </x-breeze.responsive-nav-link>
+            <x-breeze.responsive-nav-link :href="route('order.index')" :active="request()->routeIs('order.*')">
+                Commandes
+            </x-breeze.responsive-nav-link>
+            <x-breeze.responsive-nav-link :href="route('productcategory.index')" :active="request()->routeIs('productcategory.*')">
+                Catégories
             </x-breeze.responsive-nav-link>
         </div>
 
