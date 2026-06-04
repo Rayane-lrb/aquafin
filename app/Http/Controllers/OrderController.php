@@ -34,7 +34,7 @@ class OrderController extends Controller
             'user_id'    => Auth::id(),
             'product_id' => $request->product_id,
             'quantity'   => $request->quantity,
-            'status'     => 'pending',
+            'status'     => 'in_afwachting',
         ]);
 
         return redirect()->route('order.index');
@@ -55,4 +55,6 @@ class OrderController extends Controller
 
         return redirect()->route('order.index');
     }
+
+
 }

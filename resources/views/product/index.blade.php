@@ -27,9 +27,9 @@
                         @foreach ($products as $product)
                         <tr class="border-b">
                             <td class="py-2">{{ $product->name }}</td>
-                            <td class="py-2">{{ $product->category->name }}</td>
+                            <td class="py-2">{{ $product->product_category_id }}</td>
                             <td class="py-2">{{ $product->stock }}</td>
-                            <td class="py-2">{{ $product->is_active ? 'Oui' : 'Non' }}</td>
+                            <td class="py-2">{{ $product->is_active ? 'Ja' : 'Neen' }}</td>
                             <td class="py-2 flex gap-2">
                                 <a href="{{ route('product.edit', $product->id) }}" class="text-blue-500">Modifier</a>
                                 <form action="{{ route('product.destroy', $product->id) }}" method="POST">
@@ -40,7 +40,7 @@
                                 </form>
                             </td>
                         </tr>
-                        @endforeach 
+                        @endforeach
                     </tbody>
                 </table>
             </div>
