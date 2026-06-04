@@ -32,4 +32,5 @@ Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destr
 
 Route::get('/product', [ProductController::class, 'index'])->name('product.index');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
 require __DIR__.'/auth.php';
