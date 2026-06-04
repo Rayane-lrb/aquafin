@@ -16,46 +16,73 @@
         </h1>
 
         <div class="flex gap-3">
-            <button
-                id="openCartBtn"
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+            <button id="openCartBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
                 Winkelwagen (2)
             </button>
 
-            <button
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                 Meldingen (3)
             </button>
-
         </div>
     </div>
 
-    <div class="mb-8">
-        <input
-            type="text"
-            placeholder="Zoek materiaal..."
-            class="w-full border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+<form method="GET" action="{{ route('technieker') }}" class="mb-8 flex gap-4">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ request('search') }}"
+        placeholder="Zoek materiaal..."
+        class="flex-1 border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+    <select
+        name="category"
+        onchange="this.form.submit()"
+        class="border border-gray-300 rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        <option value="">
+            Alle categorieën
+        </option>
+
+        <option value="1" {{ request('category') == 1 ? 'selected' : '' }}>
+            Bevestigingsmateriaal
+        </option>
+
+        <option value="2" {{ request('category') == 2 ? 'selected' : '' }}>
+            Persoonlijke beschermingsmiddelen (PBM)
+        </option>
+
+        <option value="3" {{ request('category') == 3 ? 'selected' : '' }}>
+            Gereedschap (manueel & elektrisch)
+        </option>
+
+        <option value="4" {{ request('category') == 4 ? 'selected' : '' }}>
+            Technische onderhoudsmaterialen
+        </option>
+
+        <option value="5" {{ request('category') == 5 ? 'selected' : '' }}>
+            Specifieke Aquafin/riolering gerelateerde tools
+        </option>
+
+        <option value="6" {{ request('category') == 6 ? 'selected' : '' }}>
+            Diversen / Verbruiksgoederen
+        </option>
+
+    </select>
+
+    <button
+        type="submit"
+        class="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition">
+        Zoeken
+    </button>
+
+</form>
 
     <div class="mb-8">
         <h2 class="text-xl font-semibold mb-4">
             Veelgebruikte materialen
         </h2>
 
-        <div class="flex flex-wrap gap-3">
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                PVC Buis 50mm
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Koppeling 90°
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Afsluitkraan
-            </button>
-            <button class="bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
-                Watermeter
-            </button>
-        </div>
     </div>
 
     <div class="mb-8">
@@ -64,53 +91,34 @@
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-lg">
-                    PVC Buis 50mm
-                </h3>
-                <p class="text-gray-600 mt-2">
-                    Voorraad: 120
-                </p>
-                <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Toevoegen
-                </button>
-            </div>
+            @foreach($products as $product)
 
             <div class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-lg">
-                    Koppeling 90°
-                </h3>
-                <p class="text-gray-600 mt-2">
-                    Voorraad: 75
-                </p>
-                <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Toevoegen
-                </button>
-            </div>
 
-            <div class="bg-white p-5 rounded-xl shadow">
                 <h3 class="font-semibold text-lg">
-                    Afsluitkraan
+                    {{ $product->name }}
                 </h3>
                 <p class="text-gray-600 mt-2">
-                    Voorraad: 42
+                    Voorraad: {{ $product->stock }}
                 </p>
+
                 <button class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                     Toevoegen
                 </button>
+
             </div>
+            @endforeach
         </div>
     </div>
 
     <div>
-        <button
-            class="bg-gray-800 text-white px-5 py-3 rounded-lg hover:bg-gray-900 transition">
+        <button class="bg-gray-800 text-white px-5 py-3 rounded-lg hover:bg-gray-900 transition">
             Vorige bestellingen bekijken
         </button>
     </div>
 </div>
 
-<!-- Overlay (donker scherm) -->
+<!-- Winkelwagen Panel ---->
 <div id="cartOverlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
 <!-- Winkelwagen Panel (initieel buiten scherm) -->
