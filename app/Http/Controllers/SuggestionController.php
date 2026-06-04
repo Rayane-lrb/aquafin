@@ -17,4 +17,8 @@ class SuggestionController extends Controller
 
         return view('suggestion.show', ['suggestion' => $suggestion]);
     }
+
+    public function create() {
+        return view('suggestion.create');
+    }
 }
