@@ -11,4 +11,10 @@ class SuggestionController extends Controller
 
         return view('suggestion.index', ['suggestions' => $suggestions]);
     }
+
+    public function show(string $id) {
+        $suggestion = Suggestion::findOrFail($id);
+
+        return view('suggestion.show', ['suggestion' => $suggestion]);
+    }
 }
