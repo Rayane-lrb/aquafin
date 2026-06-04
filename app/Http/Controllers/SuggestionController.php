@@ -47,4 +47,14 @@ class SuggestionController extends Controller
 
         return redirect()->route('suggestion.index');
     }
+
+    public function reject(string $id) {
+                $suggestion = Suggestion::findOrFail($id);
+
+        $suggestion::update([
+            'status' => 'rejected'
+        ]);
+
+        return redirect()->route('suggestion.index');
+    }
 }
