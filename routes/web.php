@@ -11,6 +11,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/dashboard', function () {
+    return redirect()->route('product.index');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::get('/technieker', function (Request $request) {
     $products = Product::query();
 
