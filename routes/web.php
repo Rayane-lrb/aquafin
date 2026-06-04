@@ -1,8 +1,9 @@
 <?php
+
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SuggestionController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Userzone\SuggestionController;
 
 Route::get('/', function () {
     return view('welcome');
