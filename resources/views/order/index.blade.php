@@ -1,55 +1,62 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Commandes
-        </h2>
-    </x-slot>
+    <x-slot name="header">Mijn Orders</x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <p class="text-sm text-gray-500">Overzicht van alle bestellingen</p>
+        <a href="{{ route('order.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            + Nieuwe bestelling
+        </a>
+    </div>
 
-                <a href="{{ route('order.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
-                    Nouvelle commande
-                </a>
-
-                <table class="w-full mt-4 text-left border-collapse">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="py-2">Produit</th>
-                            <th class="py-2">Demandé par</th>
-                            <th class="py-2">Quantité</th>
-                            <th class="py-2">Statut</th>
-                            <th class="py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($orders as $order)
-                        <tr class="border-b">
-                            <td class="py-2">{{ $order->product->name }}</td>
-                            <td class="py-2">{{ $order->user->name }}</td>
-                            <td class="py-2">{{ $order->quantity }}</td>
-                            <td class="py-2">{{ $order->status }}</td>
-                            <td class="py-2 flex gap-2">
-                                @if ($order->status === 'pending')
-                                    <form action="{{ route('order.approve', $order->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-green-500">Approuver</button>
-                                    </form>
-                                    <form action="{{ route('order.reject', $order->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-red-500">Rejeter</button>
-                                    </form>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
+    <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                <tr>
+                    <th class="px-6 py-3">Product</th>
+                    <th class="px-6 py-3">Aangevraagd door</th>
+                    <th class="px-6 py-3">Aantal</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Acties</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse ($orders as $order)
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-900">{{ $order->product->name }}</td>
+                    <td class="px-6 py-4 text-gray-500">{{ $order->user->name }}</td>
+                    <td class="px-6 py-4 text-gray-700">{{ $order->quantity }}</td>
+                    <td class="px-6 py-4">
+                        @if ($order->status === 'approved')
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Goedgekeurd</span>
+                        @elseif ($order->status === 'rejected')
+                            <span class="bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded-full">Geweigerd</span>
+                        @else
+                            <span class="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded-full">In behandeling</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 flex gap-3">
+                        @if ($order->status === 'pending')
+                            <form action="{{ route('order.approve', $order->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="text-green-600 hover:underline">Goedkeuren</button>
+                            </form>
+                            <form action="{{ route('order.reject', $order->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="text-red-500 hover:underline">Weigeren</button>
+                            </form>
+                        @else
+                            <span class="text-gray-300">—</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">Geen bestellingen gevonden.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </x-app-layout>

@@ -1,49 +1,56 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Produits
-        </h2>
-    </x-slot>
+    <x-slot name="header">Producten</x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <p class="text-sm text-gray-500">Overzicht van alle beschikbare producten</p>
+        <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            + Product toevoegen
+        </a>
+    </div>
 
-                <a href="{{ route('product.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
-                    Ajouter un produit
-                </a>
-
-                <table class="w-full mt-4 text-left border-collapse">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="py-2">Nom</th>
-                            <th class="py-2">Catégorie</th>
-                            <th class="py-2">Stock</th>
-                            <th class="py-2">Actif</th>
-                            <th class="py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($products as $product)
-                        <tr class="border-b">
-                            <td class="py-2">{{ $product->name }}</td>
-                            <td class="py-2">{{ $product->product_category_id }}</td>
-                            <td class="py-2">{{ $product->stock }}</td>
-                            <td class="py-2">{{ $product->is_active ? 'Ja' : 'Neen' }}</td>
-                            <td class="py-2 flex gap-2">
-                                <a href="{{ route('product.edit', $product->id) }}" class="text-blue-500">Modifier</a>
-                                <form action="{{ route('product.destroy', $product->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500">Supprimer</button>
-
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                <tr>
+                    <th class="px-6 py-3">Naam</th>
+                    <th class="px-6 py-3">Categorie</th>
+                    <th class="px-6 py-3">Stock</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Acties</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse ($products as $product)
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-900">{{ $product->name }}</td>
+                    <td class="px-6 py-4 text-gray-500">{{ optional($product->category)->name ?? '—' }}</td>
+                    <td class="px-6 py-4">
+                        <span class="{{ $product->stock <= 5 ? 'text-red-600 font-semibold' : 'text-gray-700' }}">
+                            {{ $product->stock }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        @if ($product->is_active)
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Actief</span>
+                        @else
+                            <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2 py-1 rounded-full">Inactief</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 flex gap-3">
+                        <a href="{{ route('product.edit', $product->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
+                        <form action="{{ route('product.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Dit product verwijderen?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:underline">Verwijderen</button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">Geen producten gevonden.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </x-app-layout>
