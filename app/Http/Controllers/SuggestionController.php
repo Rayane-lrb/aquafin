@@ -41,7 +41,7 @@ class SuggestionController extends Controller
     public function approve(string $id) {
         $suggestion = Suggestion::findOrFail($id);
 
-        $suggestion::update([
+        $suggestion->update([
             'status' => 'approved'
         ]);
 
@@ -51,10 +51,16 @@ class SuggestionController extends Controller
     public function reject(string $id) {
                 $suggestion = Suggestion::findOrFail($id);
 
-        $suggestion::update([
+        $suggestion->update([
             'status' => 'rejected'
         ]);
 
         return redirect()->route('suggestion.index');
+    }
+
+    public function destroy(string $id) {
+        $suggestion = Suggestion::findOrFail($id);
+
+        $suggestion->delete();
     }
 }

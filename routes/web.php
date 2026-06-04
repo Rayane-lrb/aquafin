@@ -62,5 +62,6 @@ Route::get('/suggestion/create', [SuggestionController::class, 'create'])->('sug
 Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
 Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
 Route::patch('/suggestion/{id}/reject', [SuggestionController::class, 'reject'])->name('suggestion.reject');
+Route::delete('/suggestion/{id}', [SuggestionController::class, 'destroy'])->name('suggestion.destroy');
 
 require __DIR__.'/auth.php';
