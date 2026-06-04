@@ -1,9 +1,11 @@
 <?php
+
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
@@ -13,12 +15,20 @@ Route::get('/dashboard', function () {
     return view('userzone.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/technieker', function () {
+Route::get('/technieker', function (Request $request) {
 
-    $products = Product::all();
+    $products = Product::query();
+
+    if ($request->filled('search')) {
+        $products->where('name', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('category')) {
+        $products->where('product_category_id', $request->category);
+    }
 
     return view('userzone.technieker', [
-        'products' => $products
+        'products' => $products->get()
     ]);
 
 })->middleware(['auth', 'verified'])->name('technieker');
