@@ -60,6 +60,6 @@ Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggest
 Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
 Route::get('/suggestion/create', [SuggestionController::class, 'create'])->('suggestion.create');
 Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
-Route::get('/suggestion/{id}/edit', [SuggestionController::class, 'edit'])->name('suggestion.edit');
+Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
 
 require __DIR__.'/auth.php';

@@ -38,9 +38,13 @@ class SuggestionController extends Controller
         return redirect()->route('suggestion.create');
     }
 
-    public function edit(string $id) {
+    public function approve(string $id) {
         $suggestion = Suggestion::findOrFail($id);
 
-        return view('suggestion.edit', ['suggestion' => $suggestion]);
+        $suggestion::update([
+            'status' => 'approved'
+        ]);
+
+        return redirect()->route('suggestion.index');
     }
 }
