@@ -2,13 +2,10 @@
 
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SuggestionController;
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
-=======
+
 use App\Http\Controllers\OrderController;
 
->>>>>>> 03c43ae03991fa283ac95cd20447e583cf5271e7
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +47,5 @@ Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
 Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 
-Route::resource('suggestions', SuggestionController::class);
 
 require __DIR__.'/auth.php';
