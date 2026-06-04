@@ -34,7 +34,13 @@ class SuggestionController extends Controller
             'user_id' => auth()->id(),
             'status'  => 'pending'
         ]);
-        
+
         return redirect()->route('suggestion.create');
+    }
+
+    public function edit(string $id) {
+        $suggestion = Suggestion::findOrFail($id);
+
+        return view('suggestion.edit', ['suggestion' => $suggestion]);
     }
 }
