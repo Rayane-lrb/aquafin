@@ -12,7 +12,6 @@ class SuggestionController extends Controller
     public function index()
     {
         $suggestions = Suggestion::with('user')->latest()->get();
-
         return view('suggestion.index', ['suggestions' => $suggestions]);
     }
 
@@ -24,7 +23,6 @@ class SuggestionController extends Controller
     public function show(string $id)
     {
         $suggestion = Suggestion::with('user')->findOrFail($id);
-
         return view('suggestion.show', ['suggestion' => $suggestion]);
     }
 
@@ -47,25 +45,19 @@ class SuggestionController extends Controller
 
     public function approve(string $id)
     {
-        $suggestion = Suggestion::findOrFail($id);
-        $suggestion->update(['status' => 'goedgekeurd']);
-
+        Suggestion::findOrFail($id)->update(['status' => 'goedgekeurd']);
         return redirect()->route('suggestion.index');
     }
 
     public function reject(string $id)
     {
-        $suggestion = Suggestion::findOrFail($id);
-        $suggestion->update(['status' => 'afgekeurd']);
-
+        Suggestion::findOrFail($id)->update(['status' => 'afgekeurd']);
         return redirect()->route('suggestion.index');
     }
 
     public function destroy(string $id)
     {
-        $suggestion = Suggestion::findOrFail($id);
-        $suggestion->delete();
-
+        Suggestion::findOrFail($id)->delete();
         return redirect()->route('suggestion.index');
     }
 }
