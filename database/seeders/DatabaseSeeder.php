@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Suggestion;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,10 +27,17 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        user::factory()->create([
+        User::factory()->create([
             'name' => 'tech user',
             'email' => 'tech@user.com',
             'role' => 'technieker',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'magazijn user',
+            'email' => 'mag@user.com',
+            'role' => 'magazijnBeheerder',
             'password' => bcrypt('password'),
         ]);
 

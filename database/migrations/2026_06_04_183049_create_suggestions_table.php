@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['in behandeling', 'goedgekeurd', 'afgekeurd'])->default('in behandeling');
             $table->timestamps();
         });
-    
+    }
 
     /**
      * Reverse the migrations.
