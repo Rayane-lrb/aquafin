@@ -23,7 +23,7 @@ class OrderFactory extends Factory
             'product_id' => Product::inRandomOrder()->first()?->id
                             ?? Product::factory()->create()->id,
             'quantity'   => $this->faker->numberBetween(1, 50),
-            'status'     => $this->faker->randomElement(['pending', 'approved', 'rejected'])
+            'status'     => $this->faker->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd'])
         ];
     }
 }
