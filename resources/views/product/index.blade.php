@@ -1,13 +1,25 @@
 <x-app-layout>
     <x-slot name="header">Producten</x-slot>
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
         <p class="text-sm text-gray-500">Overzicht van alle beschikbare producten</p>
-        @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
-            <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-                + Product toevoegen
-            </a>
-        @endif
+        <div class="flex items-center gap-3">
+            <form method="GET" action="{{ route('product.index') }}">
+                <select name="category" onchange="this.form.submit()" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Alle categorieën</option>
+                    @foreach ($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ (string) $selectedCategory === (string) $cat->id ? 'selected' : '' }}>
+                            {{ $cat->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
+                <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
+                    + Product toevoegen
+                </a>
+            @endif
+        </div>
     </div>
 
     @if ($products->isEmpty())
