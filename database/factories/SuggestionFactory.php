@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Suggestion;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +23,7 @@ class SuggestionFactory extends Factory
                              ?? User::factory()->create(['role' => 'technieker'])->id,
             'title'       => $this->faker->sentence(4),
             'description' => $this->faker->paragraph(),
-            'status'      => $this->faker->randomElement(['pending', 'reviewing', 'approved', 'rejected']),
+            'status'      => $this->faker->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd']),
         ];
     }
 }

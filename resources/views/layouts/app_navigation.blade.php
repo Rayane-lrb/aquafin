@@ -56,8 +56,6 @@
             Categorieën
         </a>
 
-<<<<<<< Updated upstream
-=======
         @if (Auth::user()->role === 'admin')
         <a href="{{ route('admin.users.index') }}"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
@@ -89,7 +87,6 @@
         </a>
         @endif
 
->>>>>>> Stashed changes
     </nav>
 
     <!-- Bottom -->

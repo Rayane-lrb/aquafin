@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @forelse ($productcategories as $category)
+                @forelse ($productCategories as $category)
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4 font-medium text-gray-900">{{ $category->name }}</td>
                     <td class="px-6 py-4 flex gap-3">
