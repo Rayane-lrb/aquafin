@@ -27,14 +27,48 @@ class OrderController extends Controller
     {
         $request->validate([
             'product_id' => ['required', 'exists:products,id'],
-            'quantity'   => ['required', 'integer', 'min:1'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
         Order::create([
-            'user_id'    => Auth::id(),
+            'user_id' => Auth::id(),
             'product_id' => $request->product_id,
-            'quantity'   => $request->quantity,
-            'status'     => 'pending',
+            'quantity' => $request->quantity,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('order.index');
+    }
+
+    public function edit(string $id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->user_id !== Auth::id() && Auth::user()?->role !== 'admin') {
+            abort(403);
+        }
+
+        $products = Product::where('is_active', true)->get();
+
+        return view('order.edit', ['order' => $order, 'products' => $products]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->user_id !== Auth::id() && Auth::user()?->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'product_id' => ['required', 'exists:products,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $order->update([
+            'product_id' => $request->product_id,
+            'quantity' => $request->quantity,
         ]);
 
         return redirect()->route('order.index');
@@ -55,6 +89,4 @@ class OrderController extends Controller
 
         return redirect()->route('order.index');
     }
-
-
 }

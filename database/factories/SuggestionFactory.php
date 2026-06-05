@@ -19,11 +19,11 @@ class SuggestionFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'     => User::where('role', 'technieker')->inRandomOrder()->first()?->id
+            'user_id' => User::where('role', 'technieker')->inRandomOrder()->first()?->id
                              ?? User::factory()->create(['role' => 'technieker'])->id,
-            'title'       => $this->faker->sentence(4),
+            'title' => $this->faker->sentence(4),
             'description' => $this->faker->paragraph(),
-            'status'      => $this->faker->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd']),
+            'status' => $this->faker->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd']),
         ];
     }
 }
