@@ -17,12 +17,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['pending', 'reviewing', 'approved', 'rejected'])->default('pending');
-            
+            $table->enum('status', ['in behandeling', 'goedgekeurd', 'afgekeurd'])->default('in behandeling');
             $table->timestamps();
         });
     
-
+    }
     /**
      * Reverse the migrations.
      */
