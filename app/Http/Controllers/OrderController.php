@@ -55,12 +55,6 @@ class OrderController extends Controller
 
         return redirect()->route('order.index');
     }
-    
-public function destroy(string $id)
-    {
-        $order = Order::findOrFail($id);
-        $order->delete();
 
-        return redirect()->route('order.index');
-    }
+
 }

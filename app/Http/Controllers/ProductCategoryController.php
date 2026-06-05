@@ -10,7 +10,7 @@ class ProductCategoryController extends Controller
     public function index() {
         $productCategories = ProductCategory::all();
 
-        return view('productcategory.index', ['productcategories' => $productCategories]);
+        return view('productcategory.index', ['productCategories' => $productCategories]);
     }
 
     public function create() {
