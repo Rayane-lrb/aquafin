@@ -1,20 +1,22 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+// Redirect
+Route::get('/', fn () => redirect()->route('login'));
 
-Route::get('/dashboard', function () {
-    return redirect()->route('product.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', fn () => redirect()->route('product.index'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
+// Technieker view
 Route::get('/technieker', function (Request $request) {
     $products = Product::query();
 
@@ -29,12 +31,14 @@ Route::get('/technieker', function (Request $request) {
     return view('userzone.technieker', ['products' => $products->get()]);
 })->middleware(['auth', 'verified'])->name('technieker');
 
+// Profile
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Product categories
 Route::get('/productcategory', [ProductCategoryController::class, 'index'])->name('productcategory.index');
 Route::get('/productcategory/create', [ProductCategoryController::class, 'create'])->name('productcategory.create');
 Route::post('/productcategory', [ProductCategoryController::class, 'store'])->name('productcategory.store');
@@ -42,6 +46,7 @@ Route::get('/productcategory/{id}/edit', [ProductCategoryController::class, 'edi
 Route::patch('/productcategory/{id}', [ProductCategoryController::class, 'update'])->name('productcategory.update');
 Route::delete('/productcategory/{id}', [ProductCategoryController::class, 'destroy'])->name('productcategory.destroy');
 
+// Products
 Route::get('/product', [ProductController::class, 'index'])->name('product.index');
 Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
@@ -50,22 +55,29 @@ Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('prod
 Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
+// Orders
 Route::get('/order', [OrderController::class, 'index'])->name('order.index');
 Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
 Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 
+// Suggestions
 Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
-Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
 Route::get('/suggestion/create', [SuggestionController::class, 'create'])->name('suggestion.create');
+Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
 Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
 Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
 Route::patch('/suggestion/{id}/reject', [SuggestionController::class, 'reject'])->name('suggestion.reject');
 Route::delete('/suggestion/{id}', [SuggestionController::class, 'destroy'])->name('suggestion.destroy');
 
-Route::get('/admin/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index')->middleware('auth');
-Route::get('/admin/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create')->middleware('auth');
-Route::post('/admin/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store')->middleware('auth');
+// Admin - User management
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::patch('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
+});
 
 require __DIR__.'/auth.php';

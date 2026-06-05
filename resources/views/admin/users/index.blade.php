@@ -17,6 +17,7 @@
                     <th class="px-6 py-3">Naam</th>
                     <th class="px-6 py-3">E-mail</th>
                     <th class="px-6 py-3">Rol</th>
+                    <th class="px-6 py-3">Acties</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -31,6 +32,11 @@
                             <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">Magazijnbeheerder</span>
                         @else
                             <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Technieker</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4">
+                        @if (Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
                         @endif
                     </td>
                 </tr>

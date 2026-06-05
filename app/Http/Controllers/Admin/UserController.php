@@ -39,4 +39,30 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index');
     }
+
+    public function edit(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        return view('admin.users.edit', ['user' => $user]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name'  => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'role'  => ['required', 'in:admin,magazijnBeheerder,technieker'],
+        ]);
+
+        $user->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+            'role'  => $request->role,
+        ]);
+
+        return redirect()->route('admin.users.index');
+    }
 }
