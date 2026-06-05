@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\Userzone\ProfileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
 use Illuminate\Http\Request;
