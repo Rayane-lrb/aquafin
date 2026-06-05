@@ -34,20 +34,32 @@
                             <span class="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded-full">In behandeling</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 flex gap-3">
+                    <td class="px-6 py-4 flex gap-2 flex-wrap">
                         @if ($order->status === 'pending')
-                            <form action="{{ route('order.approve', $order->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="text-green-600 hover:underline">Goedkeuren</button>
-                            </form>
-                            <form action="{{ route('order.reject', $order->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="text-red-500 hover:underline">Weigeren</button>
-                            </form>
+                            {{-- Bewerken: creator or admin --}}
+                            @if ($order->user_id === Auth::id() || Auth::user()?->role === 'admin')
+                                <a href="{{ route('order.edit', $order->id) }}"
+                                    class="text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">
+                                    Bewerken
+                                </a>
+                            @endif
+                            {{-- Goedkeuren/Weigeren: magazijnBeheerder or admin --}}
+                            @if (Auth::user()?->role === 'magazijnBeheerder' || Auth::user()?->role === 'admin')
+                                <form action="{{ route('order.approve', $order->id) }}" method="POST">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="text-xs font-medium bg-green-50 text-green-600 hover:bg-green-100 px-3 py-1.5 rounded-lg transition">
+                                        Goedkeuren
+                                    </button>
+                                </form>
+                                <form action="{{ route('order.reject', $order->id) }}" method="POST">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">
+                                        Weigeren
+                                    </button>
+                                </form>
+                            @endif
                         @else
-                            <span class="text-gray-300">—</span>
+                            <span class="text-gray-300 text-xs">—</span>
                         @endif
                     </td>
                 </tr>
