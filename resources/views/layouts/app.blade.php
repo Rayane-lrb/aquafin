@@ -36,9 +36,9 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
                     <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        {{ strtoupper(substr(Auth::user()?->name, 0, 1)) }}
                     </div>
-                    <span class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ Auth::user()?->name }}</span>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

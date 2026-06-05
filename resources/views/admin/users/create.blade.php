@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">Gebruiker aanmaken</x-slot>
 
-    @if (Auth::user()->role !== 'admin')
+    @if (Auth::user()?->role !== 'admin')
         <div class="bg-red-100 text-red-700 px-4 py-3 rounded-lg">
             U heeft geen toegang tot deze pagina.
         </div>
@@ -53,4 +53,4 @@
         </div>
     </div>
     @endif
-</x-app-layout>
+</x-admin-layout>

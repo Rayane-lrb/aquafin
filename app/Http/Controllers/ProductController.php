@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
+        $products = Product::with('category')->get();
 
         return view('product.index', ['products' => $products]);
     }
@@ -43,9 +43,16 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        Product::create($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
+        $data = $request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
 
         return redirect()->route('product.index');
     }
@@ -56,10 +63,17 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $product = Product::findOrFail($id);
-        $product->update($request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']));
+        $data = $request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
 
         return redirect()->route('product.index');
     }

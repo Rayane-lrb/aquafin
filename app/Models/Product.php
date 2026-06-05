@@ -11,11 +11,10 @@ class Product extends Model
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
-    protected $fillable = ['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id'];
+    protected $fillable = ['name', 'image', 'stock', 'is_active', 'is_flood_tool', 'product_category_id'];
 
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);
     }
-
 }

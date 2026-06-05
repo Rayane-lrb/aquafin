@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ Route::get('/technieker', function (Request $request) {
     $products = Product::query();
 
     if ($request->filled('search')) {
-        $products->where('name', 'like', '%' . $request->search . '%');
+        $products->where('name', 'like', '%'.$request->search.'%');
     }
 
     if ($request->filled('category')) {
@@ -33,9 +34,9 @@ Route::get('/technieker', function (Request $request) {
 
 // Profile
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Product categories
@@ -59,6 +60,8 @@ Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('pro
 Route::get('/order', [OrderController::class, 'index'])->name('order.index');
 Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
+Route::get('/order/{id}/edit', [OrderController::class, 'edit'])->name('order.edit');
+Route::patch('/order/{id}', [OrderController::class, 'update'])->name('order.update');
 Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
 Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
 

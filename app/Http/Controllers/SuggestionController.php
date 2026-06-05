@@ -31,15 +31,15 @@ class SuggestionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
         ]);
 
         Suggestion::create([
-            'user_id'     => Auth::id(),
-            'title'       => $request->title,
+            'user_id' => Auth::id(),
+            'title' => $request->title,
             'description' => $request->description,
-            'status'      => 'in behandeling',
+            'status' => 'in behandeling',
         ]);
 
         return redirect()->route('suggestion.index');

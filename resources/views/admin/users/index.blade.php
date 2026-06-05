@@ -1,9 +1,9 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">Gebruikersbeheer</x-slot>
 
     <div class="flex justify-between items-center mb-6">
         <p class="text-sm text-gray-500">Overzicht van alle gebruikers</p>
-        @if (Auth::user()->role === 'admin')
+        @if (Auth::user()?->role === 'admin')
             <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                 + Gebruiker aanmaken
             </a>
@@ -35,7 +35,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4">
-                        @if (Auth::user()->role === 'admin')
+                        @if (Auth::user()?->role === 'admin')
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
                         @endif
                     </td>
@@ -48,4 +48,4 @@
             </tbody>
         </table>
     </div>
-</x-app-layout>
+</x-admin-layout>

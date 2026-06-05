@@ -34,7 +34,7 @@
                     </td>
                     <td class="px-6 py-4 flex gap-3">
                         <a href="{{ route('suggestion.show', $suggestion->id) }}" class="text-blue-600 hover:underline">Bekijken</a>
-                        @if (Auth::user()->role === 'admin' && $suggestion->status === 'in behandeling')
+                        @if (Auth::user()?->role === 'admin' && $suggestion->status === 'in behandeling')
                             <form action="{{ route('suggestion.approve', $suggestion->id) }}" method="POST">
                                 @csrf @method('PATCH')
                                 <button type="submit" class="text-green-600 hover:underline">Goedkeuren</button>
