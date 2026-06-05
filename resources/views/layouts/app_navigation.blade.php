@@ -67,6 +67,26 @@
         </a>
         @endif
 
+        @if (Auth::user()->role === 'magazijnBeheerder' || Auth::user()->role === 'admin')
+        <a href="{{ route('product.create') }}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+            {{ request()->routeIs('product.create') ? 'bg-white text-blue-700 shadow' : 'text-blue-100 hover:bg-blue-700' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Product toevoegen
+        </a>
+
+        <a href="{{ route('suggestions.index') }}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+            {{ request()->routeIs('suggestions.*') ? 'bg-white text-blue-700 shadow' : 'text-blue-100 hover:bg-blue-700' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.75 3.75 0 01-1.035 1.695L12 21l-2.755-1.02a3.75 3.75 0 01-1.035-1.695l-.347-.347z" />
+            </svg>
+            Suggesties
+        </a>
+        @endif
+
     </nav>
 
     <!-- Bottom -->
