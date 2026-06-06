@@ -10,7 +10,9 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::query()->when($query, function ($q) use ($query) {
+          $q->where('name', 'LIKE', "%{$query}%");
+          })->get();
 
         return view('product.index', ['products' => $products]);
     }
