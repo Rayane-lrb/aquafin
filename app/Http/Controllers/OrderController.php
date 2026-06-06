@@ -9,13 +9,24 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['user', 'product'])->latest()->get();
+        $query = $request->input('q');
 
-        return view('order.index', ['orders' => $orders]);
+        $orders = Order::query()
+            ->with(['user', 'product'])
+            ->when($query, function ($q) use ($query) {
+                $q->where('order_id', 'LIKE', "%{$query}%")
+                ->orWhereHas('user', function ($q) use ($query) {
+                    $q->where('name', 'LIKE', "%{$query}%");
+                });
+            })
+            ->latest()
+            ->get();
+
+        return view('order.index', ['orders' => $orders, 'query' => $query]);
     }
-
+ 
     public function create()
     {
         $products = Product::where('is_active', true)->get();
