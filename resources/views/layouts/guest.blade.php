@@ -16,10 +16,10 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.1/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-[#0ea5e9] via-[#0369a1] to-[#0c4a6e]">
             <div>
                 <a href="/">
-                    <x-breeze.application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <x-breeze.application-logo class="w-20 h-20 fill-current text-gray-500 bg-white rounded-full" />
                 </a>
             </div>
 
