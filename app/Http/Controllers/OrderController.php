@@ -45,7 +45,7 @@ class OrderController extends Controller
             'user_id' => Auth::id(),
             'product_id' => $request->product_id,
             'quantity' => $request->quantity,
-            'status' => 'pending',
+            'status' => 'in behandeling',
         ]);
 
         return redirect()->route('order.index');
@@ -88,7 +88,7 @@ class OrderController extends Controller
     public function approve(string $id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['status' => 'approved']);
+        $order->update(['status' => 'goedgekeurd']);
 
         return redirect()->route('order.index');
     }
@@ -96,7 +96,7 @@ class OrderController extends Controller
     public function reject(string $id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['status' => 'rejected']);
+        $order->update(['status' => 'afgekeurd']);
 
         return redirect()->route('order.index');
     }
