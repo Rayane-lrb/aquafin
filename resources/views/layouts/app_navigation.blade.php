@@ -7,7 +7,7 @@
     };
 @endphp
 
-<aside class="w-64 flex flex-col min-h-screen sticky top-0" style="background: linear-gradient(180deg, {{ $colors->bg }} 0%, {{ $colors->bg2 }} 100%);">
+<aside class="w-64 flex flex-col h-screen sticky top-0" style="background: linear-gradient(180deg, {{ $colors->bg }} 0%, {{ $colors->bg2 }} 100%);">
 
     <div class="px-6 py-6" style="border-bottom: 1px solid {{ $colors->border }};">
         <div class="flex items-center gap-3">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <nav class="flex-1 px-4 py-6 space-y-1">
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
         <p class="text-xs font-semibold uppercase tracking-widest px-3 mb-3" style="color: {{ $colors->text }}">Menu</p>
 
         @php
