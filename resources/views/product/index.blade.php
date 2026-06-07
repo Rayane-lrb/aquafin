@@ -1,26 +1,52 @@
 <x-app-layout>
     <x-slot name="header">Producten</x-slot>
 
-    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <p class="text-sm text-gray-500">Overzicht van alle beschikbare producten</p>
-        <div class="flex items-center gap-3">
-            <form method="GET" action="{{ route('product.index') }}">
-                <select name="category" onchange="this.form.submit()" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Alle categorieën</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ (string) $selectedCategory === (string) $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
+    {{-- Toolbar --}}
+    <form method="GET" action="{{ route('product.index') }}" class="mb-6 space-y-3">
+        <div class="flex flex-wrap gap-3 items-center justify-between">
+            {{-- Zoekbalk --}}
+            <div class="flex gap-2 flex-1 min-w-0">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $query }}"
+                    placeholder="Zoek een product..."
+                    class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    Zoeken
+                </button>
+                @if ($query || $selectedCategory)
+                    <a href="{{ route('product.index') }}" class="text-sm text-gray-400 hover:text-gray-600 px-3 py-2 rounded-lg border border-gray-200 transition">
+                        ✕ Reset
+                    </a>
+                @endif
+            </div>
+
+            {{-- Knop toevoegen --}}
             @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
                 <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
                     + Product toevoegen
                 </a>
             @endif
         </div>
-    </div>
+
+        {{-- Categorie filters als chips --}}
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('product.index', array_filter(['search' => $query])) }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-full border transition
+                      {{ ! $selectedCategory ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400' }}">
+                Alle
+            </a>
+            @foreach ($categories as $cat)
+                <a href="{{ route('product.index', array_filter(['search' => $query, 'category' => $cat->id])) }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-full border transition
+                          {{ (string) $selectedCategory === (string) $cat->id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400' }}">
+                    {{ $cat->name }}
+                </a>
+            @endforeach
+        </div>
+    </form>
 
     @if ($products->isEmpty())
         <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">

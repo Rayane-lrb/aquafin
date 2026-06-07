@@ -73,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
     Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
     Route::patch('/suggestion/{id}/reject', [SuggestionController::class, 'reject'])->name('suggestion.reject');
+    Route::post('/suggestion/{id}/add-to-catalog', [SuggestionController::class, 'addToCatalog'])->name('suggestion.addToCatalog');
     Route::delete('/suggestion/{id}', [SuggestionController::class, 'destroy'])->name('suggestion.destroy');
 });
 
