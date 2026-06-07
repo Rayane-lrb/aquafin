@@ -11,7 +11,7 @@ class Suggestion extends Model
     /** @use HasFactory<SuggestionFactory> */
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'description', 'status'];
+    protected $fillable = ['user_id', 'title', 'description', 'status', 'image'];
 
     public function user()
     {
