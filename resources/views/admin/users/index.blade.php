@@ -27,11 +27,11 @@
                     <td class="px-6 py-4 text-gray-500">{{ $user->email }}</td>
                     <td class="px-6 py-4">
                         @if ($user->role === 'admin')
-                            <span class="bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded-full">Admin</span>
+                            <span class="bg-[#526a8e] text-white text-xs font-medium px-2 py-1 rounded-full">Admin</span>
                         @elseif ($user->role === 'magazijnBeheerder')
-                            <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">Magazijnbeheerder</span>
+                            <span class="bg-[#34c49a] text-white text-xs font-medium px-2 py-1 rounded-full">Magazijnbeheerder</span>
                         @else
-                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Technieker</span>
+                            <span class="bg-[#2d57cc] text-white text-xs font-medium px-2 py-1 rounded-full">Technieker</span>
                         @endif
                     </td>
                     <td class="px-6 py-4">
