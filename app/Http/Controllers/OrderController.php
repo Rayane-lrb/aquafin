@@ -15,6 +15,9 @@ class OrderController extends Controller
 
         $orders = Order::query()
             ->with(['user', 'product'])
+            ->when(auth()->user()->role === 'technieker', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
             ->when($query, function ($q) use ($query) {
                 $q->where('order_id', 'LIKE', "%{$query}%")
                 ->orWhereHas('user', function ($q) use ($query) {
