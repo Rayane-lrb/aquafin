@@ -54,67 +54,77 @@
 
     </div>
 
-    {{-- Komende 24 uur --}}
+    {{-- Gemiddelde neerslag deze week --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div class="flex items-center justify-between mb-5">
-            <h2 class="text-sm font-semibold text-gray-800">Komende 24 uur</h2>
-            <span class="text-xs text-gray-400">mm · kans%</span>
-        </div>
-        <div class="flex gap-1 w-full pb-2">
-                @foreach ($hoursToday as $hour)
-                @php
-                    $height = min(100, ($hour['precip'] / 5) * 100);
-                    $barColor = $hour['precip'] > 2 ? '#3b82f6' : ($hour['precip'] > 0.5 ? '#93c5fd' : '#dbeafe');
-                    $isNow = $loop->first;
-                @endphp
-                <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0 {{ $isNow ? 'opacity-100' : 'opacity-80 hover:opacity-100' }} transition-opacity">
-                    <span class="text-xs {{ $isNow ? 'text-blue-600 font-semibold' : 'text-gray-400' }}">
-                        {{ $isNow ? 'Nu' : $hour['time'] }}
-                    </span>
-                    <div class="w-full bg-gray-100 rounded-full overflow-hidden flex items-end" style="height: 64px;">
-                        <div class="w-full rounded-full transition-all" style="height: {{ max(3, $height) }}%; background: {{ $barColor }};"></div>
-                    </div>
-                    <span class="text-xs font-semibold text-gray-600">{{ $hour['precip'] }}</span>
-                    <span class="text-xs text-blue-400 font-medium">{{ $hour['probability'] }}%</span>
-                </div>
-                @endforeach
-        </div>
-    </div>
+        <h2 class="text-sm font-semibold text-gray-800 mb-5">Gemiddelde neerslag deze week</h2>
 
-    {{-- 7-daagse voorspelling --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-sm font-semibold text-gray-800 mb-5">7-daagse voorspelling</h2>
-        <div class="space-y-1">
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 rounded-xl p-4 text-center">
+                <p class="text-3xl font-bold text-blue-700">{{ $weekTotal }}<span class="text-base font-normal text-blue-400 ml-1">mm</span></p>
+                <p class="text-xs text-gray-400 mt-1">Totaal deze week</p>
+            </div>
+            <div class="bg-blue-50 rounded-xl p-4 text-center">
+                <p class="text-3xl font-bold text-blue-700">{{ $weekAvg }}<span class="text-base font-normal text-blue-400 ml-1">mm</span></p>
+                <p class="text-xs text-gray-400 mt-1">Gemiddeld per dag</p>
+            </div>
+            <div class="bg-blue-50 rounded-xl p-4 text-center">
+                <p class="text-3xl font-bold text-blue-700">{{ $rainyDays }}<span class="text-base font-normal text-blue-400">/7</span></p>
+                <p class="text-xs text-gray-400 mt-1">Dagen met neerslag</p>
+            </div>
+        </div>
+
+        @php $maxMM = max(collect($days)->max('precip_sum'), 0.1); @endphp
+        <div class="flex items-end gap-2">
             @foreach ($days as $i => $day)
             @php
-                $pct      = min(100, ($day['precip_sum'] / 20) * 100);
-                $barColor = $day['precip_sum'] > 5 ? '#3b82f6' : ($day['precip_sum'] > 1 ? '#93c5fd' : '#dbeafe');
-                $probColor = $day['probability'] >= 70 ? 'text-blue-600' : ($day['probability'] >= 40 ? 'text-amber-500' : 'text-gray-300');
+                $height   = max(($day['precip_sum'] / $maxMM) * 100, $day['precip_sum'] > 0 ? 4 : 0);
+                $barColor = $day['precip_sum'] > 5 ? '#1d4ed8' : ($day['precip_sum'] > 0 ? '#60a5fa' : '#e5e7eb');
                 $isToday  = $i === 0;
             @endphp
-            <div class="flex items-center gap-4 px-3 py-3 rounded-xl {{ $isToday ? 'bg-blue-50' : 'hover:bg-gray-50' }} transition-colors">
-
-                <span class="text-sm w-20 capitalize {{ $isToday ? 'text-blue-700 font-semibold' : 'text-gray-600 font-medium' }}">
+            <div class="flex flex-col items-center gap-1 flex-1">
+                <span class="text-xs font-medium text-blue-600">{{ $day['precip_sum'] > 0 ? $day['precip_sum'] : '' }}</span>
+                <div class="w-full bg-gray-100 rounded-t-lg flex items-end" style="height: 80px;">
+                    <div class="w-full rounded-t-lg" style="height: {{ $height }}%; background: {{ $barColor }};"></div>
+                </div>
+                <span class="text-xs {{ $isToday ? 'text-blue-700 font-semibold' : 'text-gray-400' }} text-center">
                     {{ $isToday ? 'Vandaag' : $day['date'] }}
                 </span>
-
-                <div class="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                    <div class="h-1.5 rounded-full transition-all" style="width: {{ max(2, $pct) }}%; background: {{ $barColor }};"></div>
-                </div>
-
-                <div class="flex items-center gap-4 text-right">
-                    <span class="text-sm font-semibold text-gray-700 w-12">{{ $day['precip_sum'] }} <span class="text-xs font-normal text-gray-400">mm</span></span>
-                    <span class="text-xs text-gray-400 w-8">{{ $day['precip_h'] }}u</span>
-                    <span class="text-xs font-bold w-8 {{ $probColor }}">{{ $day['probability'] }}%</span>
-                </div>
             </div>
             @endforeach
         </div>
+    </div>
 
-        <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-50">
-            <p class="text-xs text-gray-300">mm = neerslag · u = uren · % = kans</p>
-            <p class="text-xs text-gray-300">Open-Meteo · Antwerpen</p>
+    {{-- Gemiddelde neerslag per maand --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-sm font-semibold text-gray-800 mb-1">Gemiddelde neerslag per maand</h2>
+        <p class="text-xs text-gray-400 mb-5">Gemiddelde 2016–2025 · huidige maand in donkerblauw</p>
+
+        @php
+            $monthNames   = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+            $currentMonth = now()->month - 1;
+            $maxMonthly   = max($monthlyAvg) ?: 1;
+        @endphp
+
+        <div class="flex items-end gap-1">
+            @foreach ($monthlyAvg as $m => $avg)
+            @php
+                $height    = max(($avg / $maxMonthly) * 110, $avg > 0 ? 4 : 0);
+                $isCurrent = $m === $currentMonth;
+            @endphp
+            <div class="flex flex-col items-center gap-1 flex-1">
+                <span class="text-xs font-medium {{ $isCurrent ? 'text-blue-600' : 'text-gray-400' }}">
+                    {{ $avg > 0 ? $avg : '' }}
+                </span>
+                <div class="w-full bg-gray-100 rounded-t-lg flex items-end" style="height: 110px;">
+                    <div class="w-full rounded-t-lg" style="height: {{ $height }}px; background: {{ $isCurrent ? '#1d4ed8' : '#bfdbfe' }};"></div>
+                </div>
+                <span class="text-xs {{ $isCurrent ? 'text-blue-700 font-semibold' : 'text-gray-500' }}">
+                    {{ $monthNames[$m] }}
+                </span>
+            </div>
+            @endforeach
         </div>
+        <p class="text-xs text-gray-300 mt-3 text-right">mm/maand</p>
     </div>
 
     @endif
