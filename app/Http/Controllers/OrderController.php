@@ -90,6 +90,18 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $order->update(['status' => 'goedgekeurd']);
 
+        $product = $order->product;
+
+        if ($product->stock < $order->quantity) {
+            return redirect()->route('order.index')
+                ->with('error', 'Niet genoeg stock om deze bestelling goed te keuren!');
+        }
+
+        $product->decrement('stock', $order->quantity);
+    
+        $order->update(['status' => 'goedgekeurd']);
+
+
         return redirect()->route('order.index');
     }
 
