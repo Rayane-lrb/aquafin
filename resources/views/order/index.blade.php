@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">Mijn Orders</x-slot>
+    <x-slot name="header">Mijn Bestellingen</x-slot>
 
     <div class="flex justify-between items-center mb-6">
         <p class="text-sm text-gray-500">Overzicht van alle bestellingen</p>
@@ -26,24 +26,25 @@
                     <td class="px-6 py-4 text-gray-500">{{ $order->user->name }}</td>
                     <td class="px-6 py-4 text-gray-700">{{ $order->quantity }}</td>
                     <td class="px-6 py-4">
-                        @if ($order->status === 'approved')
+                        @if ($order->status === 'goedgekeurd')
                             <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Goedgekeurd</span>
-                        @elseif ($order->status === 'rejected')
-                            <span class="bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded-full">Geweigerd</span>
+                        @elseif ($order->status === 'afgekeurd')
+                            <span class="bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded-full">Afgekeurd</span>
                         @else
                             <span class="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded-full">In behandeling</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 flex gap-2 flex-wrap">
-                        @if ($order->status === 'pending')
-                            {{-- Bewerken: creator or admin --}}
+                        @if ($order->status === 'in behandeling')
+                            {{-- Bewerken: Alleen de maker van de bestelling of admin --}}
                             @if ($order->user_id === Auth::id() || Auth::user()?->role === 'admin')
                                 <a href="{{ route('order.edit', $order->id) }}"
                                     class="text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">
                                     Bewerken
                                 </a>
                             @endif
-                            {{-- Goedkeuren/Weigeren: magazijnBeheerder or admin --}}
+
+                            {{-- Status wijzigen: Alleen admin en magazijnBeheerder --}}
                             @if (Auth::user()?->role === 'magazijnBeheerder' || Auth::user()?->role === 'admin')
                                 <form action="{{ route('order.approve', $order->id) }}" method="POST">
                                     @csrf @method('PATCH')
@@ -71,5 +72,4 @@
             </tbody>
         </table>
     </div>
-
 </x-app-layout>
