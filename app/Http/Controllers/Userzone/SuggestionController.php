@@ -13,7 +13,12 @@ class SuggestionController extends Controller
 {
     public function index()
     {
-        $suggestions = Suggestion::with('user')->latest()->get();
+    $suggestions = Suggestion::with('user')
+        ->when(auth()->user()->role === 'technieker', function ($q) {
+            $q->where('user_id', auth()->id());
+        })
+        ->latest()
+        ->get();
 
         return view('suggestion.index', ['suggestions' => $suggestions]);
     }
