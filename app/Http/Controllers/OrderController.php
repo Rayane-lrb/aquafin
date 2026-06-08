@@ -26,7 +26,7 @@ class OrderController extends Controller
 
         return view('order.index', ['orders' => $orders, 'query' => $query]);
     }
- 
+
     public function create()
     {
         $products = Product::where('is_active', true)->get();
