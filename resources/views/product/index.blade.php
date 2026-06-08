@@ -60,7 +60,7 @@
             {{-- Image --}}
             @if ($product->image)
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                    class="w-full h-40 object-cover">
+                    class="w-full h-40 object-contain object-center p-3 bg-white">
             @else
                 <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
