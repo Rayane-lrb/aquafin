@@ -1,0 +1,10 @@
+# SSH crontab
+# Add here your cron jobs.
+# Example: Run maintenance script every first of the month at 02:05
+# 5 2 1 * * /crons/maintenance.sh
+# Format: m h dom mon dow command
+# 
+# NOTE: It is NOT possible to override environment variables! (SHELL, PATH, ...)
+# Used values are:
+# SHELL=/bin/sh
+# PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin

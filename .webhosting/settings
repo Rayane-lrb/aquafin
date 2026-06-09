@@ -1,0 +1,7 @@
+[aquafyncom]
+shortcode = aquafz
+phpversion = 8.4
+phpextensions = imagick
+nodeversion = 22
+mailfrom = aquafyncom@webhosting.be
+
