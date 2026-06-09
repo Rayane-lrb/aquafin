@@ -55,7 +55,7 @@
     @else
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         @foreach ($products as $product)
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col {{ !$product->is_active ? 'opacity-50' : '' }}">
 
             {{-- Image --}}
             @if ($product->image)
@@ -86,7 +86,7 @@
                 </div>
 
                 {{-- Bestellen (technieker) --}}
-                @if (Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin')
+                @if ((Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin') && $product->is_active)
                 <div class="mt-4 flex gap-2 pt-3 border-t border-gray-100">
                     {{-- Toevoegen aan mandje --}}
                     <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
@@ -108,13 +108,24 @@
                 </div>
                 @endif
 
-                {{-- Bewerken/Verwijderen (admin + magazijnBeheerder) --}}
+                {{-- Bewerken/Verwijderen/Toggle (admin + magazijnBeheerder) --}}
                 @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
                 <div class="mt-2 flex gap-2">
                     <a href="{{ route('product.edit', $product->id) }}"
                         class="flex-1 text-center text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 py-1.5 rounded-lg transition">
                         Bewerken
                     </a>
+                    <form action="{{ route('product.toggle', $product->id) }}" method="POST" class="flex-1">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit"
+                            class="w-full text-xs font-medium py-1.5 rounded-lg transition
+                                {{ $product->is_active
+                                    ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100'
+                                    : 'bg-green-50 text-green-600 hover:bg-green-100' }}">
+                            {{ $product->is_active ? 'Verbergen' : 'Tonen' }}
+                        </button>
+                    </form>
                     <form action="{{ route('product.destroy', $product->id) }}" method="POST"
                         onsubmit="return confirm('Dit product verwijderen?')" class="flex-1">
                         @csrf
