@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +15,7 @@ class OrderController extends Controller
         $query = $request->input('q');
 
         $orders = Order::query()
-            ->with(['user', 'product'])
+            ->with(['user', 'product', 'warehouse'])
             ->when(auth()->user()->role === 'technieker', function ($q) {
                 $q->where('user_id', auth()->id());
             })
@@ -30,25 +31,29 @@ class OrderController extends Controller
         return view('order.index', ['orders' => $orders, 'query' => $query]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $products = Product::where('is_active', true)->get();
+        $products   = Product::where('is_active', true)->get();
+        $warehouses = Warehouse::all();
+        $productId  = $request->input('product_id');
 
-        return view('order.create', ['products' => $products]);
+        return view('order.create', compact('products', 'warehouses', 'productId'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => ['required', 'exists:products,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'product_id'   => ['required', 'exists:products,id'],
+            'quantity'     => ['required', 'integer', 'min:1'],
+            'warehouse_id' => ['required', 'exists:warehouses,id'],
         ]);
 
         Order::create([
-            'user_id' => Auth::id(),
-            'product_id' => $request->product_id,
-            'quantity' => $request->quantity,
-            'status' => 'in behandeling',
+            'user_id'      => Auth::id(),
+            'product_id'   => $request->product_id,
+            'quantity'     => $request->quantity,
+            'status'       => 'in behandeling',
+            'warehouse_id' => $request->warehouse_id,
         ]);
 
         return redirect()->route('order.index');
@@ -114,5 +119,25 @@ class OrderController extends Controller
         $order->update(['status' => 'afgekeurd']);
 
         return redirect()->route('order.index');
+    }
+
+    public function deliver(string $id)
+    {
+        $role = Auth::user()?->role;
+
+        if (!in_array($role, ['magazijnBeheerder', 'admin'])) {
+            abort(403);
+        }
+
+        $order = Order::findOrFail($id);
+
+        if ($order->status !== 'goedgekeurd') {
+            return redirect()->route('order.index')
+                ->with('error', 'Enkel goedgekeurde bestellingen kunnen afgeleverd worden.');
+        }
+
+        $order->update(['status' => 'geleverd']);
+
+        return redirect()->route('order.index')->with('success', 'Bestelling gemarkeerd als geleverd.');
     }
 }

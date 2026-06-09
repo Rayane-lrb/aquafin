@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\NeerslagController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\Userzone\SuggestionController;
 use App\Models\Product;
@@ -61,6 +63,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/product/{id}', [ProductController::class, 'update'])->name('product.update');
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
+    // Cart (mandje)
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+    // Warehouses
+    Route::get('/warehouse', [WarehouseController::class, 'index'])->name('warehouse.index');
+    Route::get('/warehouse/create', [WarehouseController::class, 'create'])->name('warehouse.create');
+    Route::post('/warehouse', [WarehouseController::class, 'store'])->name('warehouse.store');
+    Route::get('/warehouse/{id}/edit', [WarehouseController::class, 'edit'])->name('warehouse.edit');
+    Route::patch('/warehouse/{id}', [WarehouseController::class, 'update'])->name('warehouse.update');
+    Route::delete('/warehouse/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.destroy');
+
     // Orders
     Route::get('/order', [OrderController::class, 'index'])->name('order.index');
     Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
@@ -69,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/order/{id}', [OrderController::class, 'update'])->name('order.update');
     Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
     Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
+    Route::patch('/order/{id}/deliver', [OrderController::class, 'deliver'])->name('order.deliver');
 
     // Suggestions
     Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
