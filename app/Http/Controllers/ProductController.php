@@ -12,8 +12,10 @@ class ProductController extends Controller
     {
         $query = $request->input('search');
         $selectedCategory = $request->input('category');
+        $role = auth()->user()?->role;
 
         $products = Product::query()
+            ->when($role === 'technieker', fn ($q) => $q->where('is_active', true))
             ->when($query, fn ($q) => $q->where('name', 'LIKE', "%{$query}%"))
             ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
             ->get();
@@ -59,7 +61,8 @@ class ProductController extends Controller
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data = $request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']);
+        $data = $request->only(['name', 'stock', 'product_category_id']);
+        $data['is_active'] = true;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
@@ -80,13 +83,21 @@ class ProductController extends Controller
         ]);
 
         $product = Product::findOrFail($id);
-        $data = $request->only(['name', 'stock', 'is_active', 'is_flood_tool', 'product_category_id']);
+        $data = $request->only(['name', 'stock', 'product_category_id']);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
         $product->update($data);
+
+        return redirect()->route('product.index');
+    }
+
+    public function toggle(string $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update(['is_active' => !$product->is_active]);
 
         return redirect()->route('product.index');
     }
