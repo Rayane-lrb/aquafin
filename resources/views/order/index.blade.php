@@ -39,7 +39,7 @@
         ];
     @endphp
 
-    <div class="flex gap-1 mb-4 bg-gray-100 p-1 rounded-xl w-fit">
+    <div class="flex gap-1 mb-4 bg-gray-100 p-1 rounded-xl overflow-x-auto w-full sm:w-fit">
         @foreach ($tabs as $key => $t)
             <a href="{{ request()->fullUrlWithQuery(['tab' => $key]) }}"
                class="px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap
@@ -53,7 +53,7 @@
     </div>
 
     {{-- Tabel --}}
-    <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+    <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
                 <tr>
