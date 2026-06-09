@@ -40,17 +40,6 @@
                     @error('product_category_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="mb-6 flex gap-6">
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active') ? 'checked' : '' }}>
-                        Actief
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input type="checkbox" name="is_flood_tool" value="1" {{ old('is_flood_tool') ? 'checked' : '' }}>
-                        Overstromingsgereedschap
-                    </label>
-                </div>
-
                 <div class="flex gap-3">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
                         Opslaan
