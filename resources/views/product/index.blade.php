@@ -85,9 +85,32 @@
                     @endif
                 </div>
 
-                {{-- Buttons - only for admin and magazijnBeheerder --}}
-                @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
+                {{-- Bestellen (technieker) --}}
+                @if (Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin')
                 <div class="mt-4 flex gap-2 pt-3 border-t border-gray-100">
+                    {{-- Toevoegen aan mandje --}}
+                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
+                        @csrf
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
+                            </svg>
+                            Mandje
+                        </button>
+                    </form>
+                    {{-- Direct bestellen --}}
+                    <a href="{{ route('order.create', ['product_id' => $product->id]) }}"
+                        class="flex-1 text-center text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition">
+                        Direct
+                    </a>
+                </div>
+                @endif
+
+                {{-- Bewerken/Verwijderen (admin + magazijnBeheerder) --}}
+                @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
+                <div class="mt-2 flex gap-2">
                     <a href="{{ route('product.edit', $product->id) }}"
                         class="flex-1 text-center text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 py-1.5 rounded-lg transition">
                         Bewerken
