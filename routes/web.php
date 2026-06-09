@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\NeerslagController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PrecipitationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WarehouseController;
@@ -53,7 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Products
     // Neerslag
-    Route::get('/neerslag', [NeerslagController::class, 'index'])->name('neerslag.index');
+    Route::get('/neerslag', [PrecipitationController::class, 'index'])->name('neerslag.index');
 
     Route::get('/product', [ProductController::class, 'index'])->name('product.index');
     Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
