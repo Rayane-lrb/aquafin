@@ -10,7 +10,7 @@
         @endif
     </div>
 
-    <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+    <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
                 <tr>

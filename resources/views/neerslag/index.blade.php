@@ -8,7 +8,7 @@
     @else
 
     {{-- Huidige situatie --}}
-    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
 
         <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
             <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
@@ -58,7 +58,7 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <h2 class="text-sm font-semibold text-gray-800 mb-5">Gemiddelde neerslag deze week</h2>
 
-        <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div class="bg-blue-50 rounded-xl p-4 text-center">
                 <p class="text-3xl font-bold text-blue-700">{{ $weekTotal }}<span class="text-base font-normal text-blue-400 ml-1">mm</span></p>
                 <p class="text-xs text-gray-400 mt-1">Totaal deze week</p>
@@ -101,7 +101,7 @@
 
         @php $maxMonthly = max(collect($monthlyAvg)->max('total'), 0.1); @endphp
 
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @foreach ($monthlyAvg as $month)
            @php
             $isCurrent = false;
