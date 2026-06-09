@@ -14,7 +14,7 @@
             @if ($suggestion->image)
             <div>
                 <span class="text-xs text-gray-400 uppercase tracking-wider">Foto</span>
-                <img src="{{ asset('storage/' . $suggestion->image) }}" alt="Foto suggestie"
+                <img src="{{ asset($suggestion->image) }}" alt="Foto suggestie"
                     class="mt-2 w-full max-h-72 object-cover rounded-lg border border-gray-200">
             </div>
             @endif

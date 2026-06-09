@@ -59,7 +59,7 @@
 
             {{-- Image --}}
             @if ($product->image)
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
                     class="w-full h-40 object-contain object-center p-3 bg-white">
             @else
                 <div class="w-full h-40 bg-gray-100 flex items-center justify-center">

@@ -27,7 +27,7 @@
 
                 {{-- Foto --}}
                 @if ($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
                         class="w-16 h-16 object-contain rounded-lg bg-gray-50 flex-shrink-0">
                 @else
                     <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">

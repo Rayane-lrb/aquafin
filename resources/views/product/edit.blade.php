@@ -17,7 +17,7 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Afbeelding</label>
                     @if ($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" class="h-24 rounded-lg mb-2 object-cover">
+                        <img src="{{ asset($product->image) }}" class="h-24 rounded-lg mb-2 object-cover">
                     @endif
                     <input type="file" name="image" accept="image/*"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
