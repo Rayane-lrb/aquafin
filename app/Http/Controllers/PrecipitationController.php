@@ -12,6 +12,7 @@ class PrecipitationController extends Controller
         $lon = 4.4025;
 
         try {
+            // Huidige weer + 7 dagen
             $response = Http::get('https://api.open-meteo.com/v1/forecast', [
                 'latitude'      => $lat,
                 'longitude'     => $lon,
@@ -22,7 +23,7 @@ class PrecipitationController extends Controller
                 'forecast_days' => 7,
             ]);
 
-            $data = $response->json();
+            $data    = $response->json();
             $current = $data['current'] ?? [];
 
             // Komende 24 uur
@@ -63,37 +64,55 @@ class PrecipitationController extends Controller
             $weekAvg   = count($dailyPrecip) > 0 ? round($weekTotal / count($dailyPrecip), 1) : 0;
             $rainyDays = count(array_filter($dailyPrecip, fn($v) => $v > 0));
 
-            // Maandgemiddelden via historische data (2016-2025)
-            $monthTotals = array_fill(0, 12, 0);
-            $monthCounts = array_fill(0, 12, 0);
+            // Komende 16 dagen groepeer per week
+            $startDate = now()->format('Y-m-d');
+            $endDate   = now()->addDays(15)->format('Y-m-d');
 
-            $archiveRes = Http::get('https://archive-api.open-meteo.com/v1/archive', [
+            $monthForecastRes = Http::get('https://api.open-meteo.com/v1/forecast', [
                 'latitude'   => $lat,
                 'longitude'  => $lon,
-                'start_date' => '2016-01-01',
-                'end_date'   => '2025-12-31',
-                'monthly'    => 'precipitation_sum',
+                'daily'      => 'precipitation_sum',
                 'timezone'   => 'Europe/Brussels',
+                'start_date' => $startDate,
+                'end_date'   => $endDate,
             ]);
 
-            $archiveData = $archiveRes->json();
+            $monthForecastData = $monthForecastRes->json();
+            $forecastTimes     = $monthForecastData['daily']['time'] ?? [];
+            $forecastPrecip    = $monthForecastData['daily']['precipitation_sum'] ?? [];
 
-            foreach ($archiveData['monthly']['time'] ?? [] as $i => $t) {
-                $m = (int)\Carbon\Carbon::parse($t)->format('n') - 1;
-                $val = $archiveData['monthly']['precipitation_sum'][$i] ?? 0;
-                if ($val > 0) {
-                    $monthTotals[$m] += $val;
-                    $monthCounts[$m]++;
+            // Groepeer per week
+            $monthlyForecast = [];
+            foreach ($forecastTimes as $i => $date) {
+                $weekNum  = 'Week ' . \Carbon\Carbon::parse($date)->weekOfYear;
+                $weekStart = \Carbon\Carbon::parse($date)->startOfWeek()->isoFormat('D MMM');
+                $weekEnd   = \Carbon\Carbon::parse($date)->endOfWeek()->isoFormat('D MMM');
+                $weekKey   = $weekNum;
+                $weekLabel = $weekStart . ' – ' . $weekEnd;
+
+                if (!isset($monthlyForecast[$weekKey])) {
+                    $monthlyForecast[$weekKey] = [
+                        'name'  => $weekLabel,
+                        'total' => 0,
+                        'days'  => 0,
+                        'rainy' => 0,
+                    ];
                 }
+                $val = $forecastPrecip[$i] ?? 0;
+                $monthlyForecast[$weekKey]['total'] += $val;
+                $monthlyForecast[$weekKey]['days']++;
+                if ($val > 0) $monthlyForecast[$weekKey]['rainy']++;
             }
 
-            $monthlyAvg = [];
-            for ($m = 0; $m < 12; $m++) {
-                $monthlyAvg[] = $monthCounts[$m] > 0 ? round($monthTotals[$m] / $monthCounts[$m]) : 0;
+            foreach ($monthlyForecast as &$m) {
+                $m['total'] = round($m['total'], 1);
+                $m['avg']   = $m['days'] > 0 ? round($m['total'] / $m['days'], 1) : 0;
             }
+
+            $monthlyAvg = array_values($monthlyForecast);
 
         } catch (\Exception $e) {
-            return view('neerslag.index', ['error' => 'Gegevens ophalen mislukt.']);
+            return view('neerslag.index', ['error' => 'Fout: ' . $e->getMessage()]);
         }
 
         return view('neerslag.index', compact(

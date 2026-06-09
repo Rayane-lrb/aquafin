@@ -94,37 +94,44 @@
         </div>
     </div>
 
-    {{-- Gemiddelde neerslag per maand --}}
+    {{-- Voorspelling komende 3 maanden --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-sm font-semibold text-gray-800 mb-1">Gemiddelde neerslag per maand</h2>
-        <p class="text-xs text-gray-400 mb-5">Gemiddelde 2016–2025 · huidige maand in donkerblauw</p>
+        <h2 class="text-sm font-semibold text-gray-800 mb-1">Neerslag voorspelling komende 2 weken</h2>
+        <p class="text-xs text-gray-400 mb-5">Open-Meteo voorspelling per week · Antwerpen</p>
 
-        @php
-            $monthNames   = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
-            $currentMonth = now()->month - 1;
-            $maxMonthly   = max($monthlyAvg) ?: 1;
-        @endphp
+        @php $maxMonthly = max(collect($monthlyAvg)->max('total'), 0.1); @endphp
 
-        <div class="flex items-end gap-1">
-            @foreach ($monthlyAvg as $m => $avg)
-            @php
-                $height    = max(($avg / $maxMonthly) * 110, $avg > 0 ? 4 : 0);
-                $isCurrent = $m === $currentMonth;
+        <div class="grid grid-cols-3 gap-4">
+            @foreach ($monthlyAvg as $month)
+           @php
+            $isCurrent = false;
             @endphp
-            <div class="flex flex-col items-center gap-1 flex-1">
-                <span class="text-xs font-medium {{ $isCurrent ? 'text-blue-600' : 'text-gray-400' }}">
-                    {{ $avg > 0 ? $avg : '' }}
-                </span>
-                <div class="w-full bg-gray-100 rounded-t-lg flex items-end" style="height: 110px;">
-                    <div class="w-full rounded-t-lg" style="height: {{ $height }}px; background: {{ $isCurrent ? '#1d4ed8' : '#bfdbfe' }};"></div>
+            <div class="bg-blue-50 rounded-xl p-5 border {{ $isCurrent ? 'border-blue-300' : 'border-transparent' }}">
+                <p class="text-sm font-semibold text-gray-700 capitalize mb-3">{{ $month['name'] }}</p>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Totaal neerslag</span>
+                        <span class="text-sm font-bold text-blue-700">{{ $month['total'] }} mm</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Gem. per dag</span>
+                        <span class="text-sm font-bold text-blue-700">{{ $month['avg'] }} mm</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Regendagen</span>
+                        <span class="text-sm font-bold text-blue-700">{{ $month['rainy'] }}/{{ $month['days'] }}</span>
+                    </div>
                 </div>
-                <span class="text-xs {{ $isCurrent ? 'text-blue-700 font-semibold' : 'text-gray-500' }}">
-                    {{ $monthNames[$m] }}
-                </span>
+                @php
+                    $pct = min(100, ($month['total'] / $maxMonthly) * 100);
+                @endphp
+                <div class="mt-3 bg-blue-100 rounded-full h-1.5">
+                    <div class="h-1.5 rounded-full bg-blue-500" style="width: {{ $pct }}%"></div>
+                </div>
             </div>
             @endforeach
         </div>
-        <p class="text-xs text-gray-300 mt-3 text-right">mm/maand</p>
+        <p class="text-xs text-gray-300 mt-4 text-right">mm/maand · Open-Meteo</p>
     </div>
 
     @endif
