@@ -1,0 +1,30 @@
+<x-app-layout>
+    <x-slot name="header">Nieuw magazijn</x-slot>
+
+    <div class="max-w-lg">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <form action="{{ route('warehouse.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Naam</label>
+                    <input type="text" name="name" value="{{ old('name') }}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Adres <span class="text-gray-400">(optioneel)</span></label>
+                    <input type="text" name="address" value="{{ old('address') }}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    @error('address') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
+                        Opslaan
+                    </button>
+                    <a href="{{ route('warehouse.index') }}" class="text-sm text-gray-500 hover:underline px-3 py-2">Annuleren</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</x-app-layout>

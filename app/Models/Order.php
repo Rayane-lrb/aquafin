@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['user_id', 'product_id', 'quantity', 'status'];
+    protected $fillable = ['user_id', 'product_id', 'quantity', 'status', 'warehouse_id'];
 
     public function user()
     {
@@ -16,5 +16,10 @@ class Order extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 }
