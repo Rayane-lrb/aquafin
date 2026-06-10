@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Aquafin') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/aquafinlogo.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -37,7 +38,7 @@
             <div class="flex items-center justify-between">
 
                 <div class="flex items-center gap-3">
-                    <!-- Hamburger -->
+                    <!-- Hamburger Menu -->
                     <button @click="sidebarOpen = !sidebarOpen"
                             class="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
                         <svg x-show="!sidebarOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
