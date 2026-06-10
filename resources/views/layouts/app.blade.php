@@ -8,11 +8,69 @@
     <link rel="icon" type="image/png" href="{{ asset('images/aquafinlogo.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.1/dist/cdn.min.js"></script>
+    <script>
+        (function() {
+            const stored = localStorage.getItem('darkMode');
+            const pref = stored !== null ? stored === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (pref) document.documentElement.classList.add('dark');
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (localStorage.getItem('darkMode') === null) {
+                    document.documentElement.classList.toggle('dark', e.matches);
+                }
+            });
+        })();
+    </script>
     <style>
         body { font-family: 'Figtree', sans-serif; }
         [x-cloak] { display: none !important; }
+        :root { --dm-bg: #f0f4f8; --dm-surface: #ffffff; --dm-border: #e5e7eb; --dm-text: #111827; --dm-muted: #6b7280; }
+        html.dark { --dm-bg: #0f172a; --dm-surface: #1e293b; --dm-border: #334155; --dm-text: #f1f5f9; --dm-muted: #94a3b8; }
+        html.dark body { background: var(--dm-bg) !important; }
+        html.dark .bg-white { background-color: var(--dm-surface) !important; }
+        html.dark .bg-gray-50 { background-color: #1e293b !important; }
+        html.dark .bg-gray-100 { background-color: #1e293b !important; }
+        html.dark .border-gray-100, html.dark .border-gray-200, html.dark .border-gray-300 { border-color: var(--dm-border) !important; }
+        html.dark .text-gray-400, html.dark .text-gray-500 { color: var(--dm-muted) !important; }
+        html.dark .text-gray-600, html.dark .text-gray-700, html.dark .text-gray-800, html.dark .text-gray-900 { color: var(--dm-text) !important; }
+        html.dark .shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3) !important; }
+        html.dark input, html.dark select, html.dark textarea { background-color: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+        html.dark .divide-gray-100 > * + * { border-color: #334155 !important; }
+        html.dark table thead { background-color: #1e293b !important; }
+        html.dark table tbody tr:hover { background-color: #1e293b !important; }
+        html.dark .bg-blue-50 { background-color: #1e3a5f !important; }
+        html.dark .bg-green-50, html.dark .bg-green-100, html.dark .bg-emerald-100 { background-color: #065f46 !important; }
+        html.dark .bg-red-50 { background-color: #450a0a !important; }
+        html.dark .bg-yellow-100 { background-color: #422006 !important; }
+        html.dark .bg-blue-100 { background-color: #1e3a5f !important; }
+        html.dark .bg-red-100 { background-color: #450a0a !important; }
+        html.dark .border-green-200, html.dark .border-red-200, html.dark .border-blue-200 { border-color: #334155 !important; }
+        html.dark .text-red-500, html.dark .text-red-600 { color: #fca5a5 !important; }
+        html.dark .text-green-600, html.dark .text-green-700, html.dark .text-emerald-700 { color: #6ee7b7 !important; }
+        html.dark .text-blue-600, html.dark .text-blue-700 { color: #93c5fd !important; }
+        html.dark .text-yellow-700 { color: #fde68a !important; }
+        html.dark .text-orange-400 { color: #fb923c !important; }
+        html.dark .text-sky-500 { color: #38bdf8 !important; }
+        html.dark .bg-orange-50 { background-color: #431407 !important; }
+        html.dark .bg-sky-50 { background-color: #0c4a6e !important; }
+        html.dark .hover\:bg-green-100:hover { background-color: #064e3b !important; }
+        html.dark .hover\:bg-blue-50:hover { background-color: #1e3a5f !important; }
+        html.dark .hover\:bg-red-50:hover { background-color: #450a0a !important; }
+        html.dark .bg-blue-600 { background-color: #2563eb !important; }
+        html.dark .bg-emerald-600 { background-color: #059669 !important; }
+        html.dark .bg-green-600 { background-color: #16a34a !important; }
+        html.dark .hover\:bg-blue-700:hover { background-color: #1d4ed8 !important; }
+        html.dark .hover\:bg-emerald-700:hover { background-color: #047857 !important; }
+        html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+        html.dark .hover\:bg-gray-200:hover { background-color: #475569 !important; }
+        html.dark .ring-white\/20 { --tw-ring-color: rgba(255,255,255,0.1) !important; }
+        html.dark .text-white\/60, html.dark .text-white\/70 { color: rgba(255,255,255,0.7) !important; }
+        html.dark .text-white\/30 { color: rgba(255,255,255,0.4) !important; }
+        html.dark .text-white\/90 { color: rgba(255,255,255,0.9) !important; }
     </style>
 </head>
 <body class="antialiased" style="background: #f0f4f8;">
@@ -61,6 +119,13 @@
                         </div>
                         <span class="text-sm font-medium text-gray-700 hidden sm:inline">{{ Auth::user()?->name }}</span>
                     </div>
+                    <button x-data x-init="$el.querySelector('svg path').setAttribute('d', document.documentElement.classList.contains('dark') ? 'M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z' : 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z')"
+                            @click="const dark = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', dark); $el.querySelector('svg path').setAttribute('d', dark ? 'M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z' : 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z')"
+                            class="p-1.5 text-gray-400 hover:text-yellow-500 hover:bg-gray-100 rounded-lg transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
+                        </svg>
+                    </button>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="flex items-center gap-1.5 text-sm text-gray-400 hover:text-red-500 transition font-medium">
