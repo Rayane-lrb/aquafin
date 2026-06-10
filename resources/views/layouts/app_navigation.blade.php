@@ -37,15 +37,8 @@
 
     {{-- Logo & titel --}}
     <div class="px-5 py-5 flex items-center gap-3" style="border-bottom: 1px solid {{ $theme['border'] }}20;">
-        <div class="w-9 h-9 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6 8 4 12 4 15a8 8 0 0016 0c0-3-2-7-8-13z"/>
-            </svg>
-        </div>
-        <div class="min-w-0">
-            <p class="font-bold text-white text-sm leading-tight">Aquafin</p>
-            <p class="text-xs truncate" style="color: {{ $theme['muted'] }}">{{ $roleLabel }}</p>
-        </div>
+        <img src="{{ asset('images/aquafinlogo.png') }}" alt="Aquafin" class="h-8 w-auto flex-shrink-0">
+        <p class="text-xs truncate" style="color: {{ $theme['muted'] }}">{{ $roleLabel }}</p>
     </div>
 
     {{-- Navigatie --}}
