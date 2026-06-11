@@ -79,8 +79,8 @@
 
                 {{-- Bestellen (technieker) --}}
                 @if ((Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin') && $product->is_active)
-                <div class="mt-4 pt-3 border-t border-gray-100">
-                    <div class="flex items-center gap-2 mb-2">
+                <div class="mt-4 pt-3 border-t border-gray-100 space-y-2">
+                    <div class="flex items-center gap-2">
                         <button type="button" onclick="updateCart({{ $product->id }}, -1)"
                             class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
                             −
@@ -92,7 +92,13 @@
                             class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
                             +
                         </button>
-                        <span class="text-xs text-gray-400 ml-1">in mandje</span>
+                        <a href="{{ route('cart.index') }}"
+                            class="ml-auto text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
+                            </svg>
+                            Mandje
+                        </a>
                     </div>
                     <a href="{{ route('order.create', ['product_id' => $product->id]) }}"
                         class="block text-center text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition">
