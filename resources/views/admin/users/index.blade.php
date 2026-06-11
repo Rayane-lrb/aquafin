@@ -34,7 +34,7 @@
                             <span class="bg-[#2d57cc] text-white text-xs font-medium px-2 py-1 rounded-full">Technieker</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 flex items-center gap-3">
+                    <td class="px-6 Open the file in the Pro project of herd. py-4 flex items-center gap-3">
                         @if (Auth::user()?->role === 'admin')
                         <div class="flex flex-row gap-2">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>

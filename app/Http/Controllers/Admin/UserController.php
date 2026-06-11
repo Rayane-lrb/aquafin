@@ -11,7 +11,14 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::orderByRaw("CASE role
+            WHEN 'admin' THEN 1
+            WHEN 'magazijnBeheerder' THEN 2
+            WHEN 'technieker' THEN 3
+            ELSE 4
+        END")
+            ->orderBy('name')
+            ->get();
 
         return view('admin.users.index', ['users' => $users]);
     }
