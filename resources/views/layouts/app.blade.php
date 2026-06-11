@@ -150,5 +150,57 @@
     </div>
 </div>
 
+<script>
+/* ===================================================
+   Tri alphabétique global sur toutes les tables
+   Clic sur un <th> → tri asc, 2e clic → tri desc
+   =================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('table').forEach(table => {
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((th, colIndex) => {
+            th.style.cursor = 'pointer';
+            th.style.userSelect = 'none';
+            th._sortDir = 0; // 0=neutre 1=asc -1=desc
+
+            th.addEventListener('click', () => {
+                // Reset les autres colonnes
+                headers.forEach((h, i) => {
+                    if (i !== colIndex) {
+                        h._sortDir = 0;
+                        const a = h.querySelector('.sort-arrow');
+                        if (a) a.textContent = '';
+                    }
+                });
+
+                th._sortDir = th._sortDir === 1 ? -1 : 1;
+
+                // Flèche indicatrice
+                let arrow = th.querySelector('.sort-arrow');
+                if (!arrow) {
+                    arrow = document.createElement('span');
+                    arrow.className = 'sort-arrow ml-1 text-blue-500';
+                    th.appendChild(arrow);
+                }
+                arrow.textContent = th._sortDir === 1 ? ' ↑' : ' ↓';
+
+                // Trier chaque tbody de la table
+                table.querySelectorAll('tbody').forEach(tbody => {
+                    const rows = [...tbody.querySelectorAll('tr')];
+                    rows.sort((a, b) => {
+                        const aCell = a.querySelectorAll('td')[colIndex];
+                        const bCell = b.querySelectorAll('td')[colIndex];
+                        if (!aCell || !bCell) return 0;
+                        const aText = aCell.innerText.trim().toLowerCase();
+                        const bText = bCell.innerText.trim().toLowerCase();
+                        return th._sortDir * aText.localeCompare(bText, 'nl', { numeric: true });
+                    });
+                    rows.forEach(r => tbody.appendChild(r));
+                });
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>
