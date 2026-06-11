@@ -59,7 +59,9 @@
         html.dark .bg-sky-50 { background-color: #0c4a6e !important; }
         html.dark .hover\:bg-green-100:hover { background-color: #064e3b !important; }
         html.dark .hover\:bg-blue-50:hover { background-color: #1e3a5f !important; }
+        html.dark .hover\:bg-blue-100:hover { background-color: #2563eb !important; }
         html.dark .hover\:bg-red-50:hover { background-color: #450a0a !important; }
+        html.dark .hover\:bg-red-100:hover { background-color: #dc2626 !important; }
         html.dark .bg-blue-600 { background-color: #2563eb !important; }
         html.dark .bg-emerald-600 { background-color: #059669 !important; }
         html.dark .bg-green-600 { background-color: #16a34a !important; }
