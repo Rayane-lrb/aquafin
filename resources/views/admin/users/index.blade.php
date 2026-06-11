@@ -34,15 +34,23 @@
                             <span class="bg-[#2d57cc] text-white text-xs font-medium px-2 py-1 rounded-full">Technieker</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 flex items-center gap-3">
                         @if (Auth::user()?->role === 'admin')
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
+
+                            @if (Auth::user()?->id !== $user->id)
+                                <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Ben je zeker dat je deze gebruiker wil verwijderen?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:underline">Verwijderen</button>
+                                </form>
+                            @endif
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="px-6 py-8 text-center text-gray-400">Geen gebruikers gevonden.</td>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-400">Geen gebruikers gevonden.</td>
                 </tr>
                 @endforelse
             </tbody>
