@@ -112,6 +112,17 @@
                         @endif
                     </div>
 
+                    {{-- URGENCE --}}
+                    <div class="border border-red-200 bg-red-50 rounded-lg p-3">
+                        <label class="flex items-start gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="urgent" value="1" class="mt-0.5 accent-red-600 w-4 h-4">
+                            <div>
+                                <p class="text-sm font-semibold text-red-700">🚨 Urgente levering</p>
+                                <p class="text-xs text-red-500 mt-0.5">Vraag een voorrangsbehandeling aan. Het magazijn wordt op de hoogte gesteld.</p>
+                            </div>
+                        </label>
+                    </div>
+
                     <div class="border-t border-gray-100 pt-3">
                         <div class="flex justify-between text-sm text-gray-600 mb-1">
                             <span>Producten</span>
