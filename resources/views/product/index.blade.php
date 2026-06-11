@@ -55,9 +55,10 @@
     @else
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         @foreach ($products as $product)
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col {{ !$product->is_active ? 'opacity-50' : '' }}">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
 
             {{-- Image --}}
+            <div class="{{ !$product->is_active ? 'opacity-50' : '' }}">
             @if ($product->image)
                 <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
                     class="w-full h-40 object-contain object-center p-3 bg-white">
@@ -68,13 +69,14 @@
                     </svg>
                 </div>
             @endif
+            </div>
 
             {{-- Info --}}
             <div class="p-4 flex-1 flex flex-col">
-                <h3 class="font-semibold text-gray-900 text-sm">{{ $product->name }}</h3>
-                <p class="text-xs text-gray-400 mt-0.5">{{ optional($product->category)->name ?? '—' }}</p>
+                <h3 class="font-semibold text-gray-900 text-sm {{ !$product->is_active ? 'opacity-50' : '' }}">{{ $product->name }}</h3>
+                <p class="text-xs text-gray-400 mt-0.5 {{ !$product->is_active ? 'opacity-50' : '' }}">{{ optional($product->category)->name ?? '—' }}</p>
 
-                <div class="mt-3 flex items-center justify-between">
+                <div class="mt-3 flex items-center justify-between {{ !$product->is_active ? 'opacity-50' : '' }}">
                     <span class="text-xs {{ $product->stock <= 5 ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
                         Stock: {{ $product->stock }}
                     </span>
