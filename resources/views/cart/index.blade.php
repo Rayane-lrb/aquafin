@@ -55,7 +55,13 @@
         </button>
     </form>
 
-    <span class="w-8 text-center text-sm font-semibold text-gray-800">{{ $qty }}</span>
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="number" name="quantity" value="{{ $qty }}" min="1"
+            class="w-14 text-center text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-1 py-1"
+            onchange="this.form.submit()">
+    </form>
 
     <form action="{{ route('cart.update', $product->id) }}" method="POST">
         @csrf
