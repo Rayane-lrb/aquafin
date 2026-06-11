@@ -77,6 +77,15 @@
                     @endif
                 </div>
 
+                @if ($product->barcode)
+                <div class="mt-2 flex items-center gap-1.5 {{ !$product->is_active ? 'opacity-50' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h1v12H4V6zm3 0h1v12H7V6zm3 0h2v12h-2V6zm4 0h1v12h-1V6zm3 0h2v12h-2V6z"/>
+                    </svg>
+                    <span class="text-xs font-mono font-semibold text-gray-600 tracking-widest">{{ $product->barcode }}</span>
+                </div>
+                @endif
+
                 {{-- Bestellen (technieker) --}}
                 @if ((Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin') && $product->is_active)
                 <div class="mt-4 pt-3 border-t border-gray-100">
