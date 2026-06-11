@@ -36,7 +36,14 @@
                     </td>
                     <td class="px-6 py-4">
                         @if (Auth::user()?->role === 'admin')
+                        <div class="flex flex-row gap-2">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
+                            <form action="admin/users/{{ $user->id }}" methode="post">
+                                @csrf
+                                @method('delete')
+                                <button type="submit" class="text-red-600 hover:underline">Verwijderen</button>
+                            </form>
+                        </div>
                         @endif
                     </td>
                 </tr>
