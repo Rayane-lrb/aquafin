@@ -142,7 +142,11 @@
                 'Accept': 'application/json',
             },
             body: JSON.stringify({ quantity }),
-        }).then(res => res.json());
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Cart update failed');
+                return res.json();
+            });
     }
 
     function applyCartResponse(productId, data) {
@@ -182,7 +186,9 @@
         const currentQty = parseInt(qtyEl.value, 10) || 1;
         const newQty = change < 0 ? Math.max(1, currentQty + change) : currentQty + change;
 
-        updateCartOnServer(productId, newQty).then(data => applyCartResponse(productId, data));
+        updateCartOnServer(productId, newQty)
+            .then(data => applyCartResponse(productId, data))
+            .catch(() => window.location.reload());
     }
 
     function setCartQty(productId, value) {
@@ -190,11 +196,15 @@
         const qtyEl = document.getElementById('cart-qty-' + productId);
         if (qtyEl) qtyEl.value = newQty;
 
-        updateCartOnServer(productId, newQty).then(data => applyCartResponse(productId, data));
+        updateCartOnServer(productId, newQty)
+            .then(data => applyCartResponse(productId, data))
+            .catch(() => window.location.reload());
     }
 
     function removeCartItem(productId) {
-        updateCartOnServer(productId, 0).then(data => applyCartResponse(productId, data));
+        updateCartOnServer(productId, 0)
+            .then(data => applyCartResponse(productId, data))
+            .catch(() => window.location.reload());
     }
     </script>
     @endif

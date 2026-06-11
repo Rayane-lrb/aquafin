@@ -65,7 +65,7 @@
 
                 @if (!empty($item['badge']) && $item['badge'] > 0)
                     <span @if ($item['route'] === 'cart.*') id="nav-cart-badge" @endif
-
+                        class="ml-auto bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
                         {{ $item['badge'] }}
                     </span>
                 @elseif ($active)
