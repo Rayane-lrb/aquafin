@@ -4,15 +4,10 @@
     {{-- Toolbar --}}
     <form method="GET" action="{{ route('product.index') }}" class="mb-6 space-y-3">
         <div class="flex flex-wrap gap-3 items-center justify-between">
-            {{-- Zoekbalk --}}
             <div class="flex gap-2 flex-1 min-w-0">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ $query }}"
+                <input type="text" name="search" value="{{ $query }}"
                     placeholder="Zoek een product..."
-                    class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
+                    class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                     Zoeken
                 </button>
@@ -22,8 +17,6 @@
                     </a>
                 @endif
             </div>
-
-            {{-- Knop toevoegen --}}
             @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
                 <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
                     + Product toevoegen
@@ -31,7 +24,6 @@
             @endif
         </div>
 
-        {{-- Categorie filters als chips --}}
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('product.index', array_filter(['search' => $query])) }}"
                class="text-xs font-medium px-3 py-1.5 rounded-full border transition
@@ -57,7 +49,6 @@
         @foreach ($products as $product)
         <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
 
-            {{-- Image --}}
             <div class="{{ !$product->is_active ? 'opacity-50' : '' }}">
             @if ($product->image)
                 <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
@@ -71,7 +62,6 @@
             @endif
             </div>
 
-            {{-- Info --}}
             <div class="p-4 flex-1 flex flex-col">
                 <h3 class="font-semibold text-gray-900 text-sm {{ !$product->is_active ? 'opacity-50' : '' }}">{{ $product->name }}</h3>
                 <p class="text-xs text-gray-400 mt-0.5 {{ !$product->is_active ? 'opacity-50' : '' }}">{{ optional($product->category)->name ?? '—' }}</p>
@@ -89,23 +79,24 @@
 
                 {{-- Bestellen (technieker) --}}
                 @if ((Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin') && $product->is_active)
-                <div class="mt-4 flex gap-2 pt-3 border-t border-gray-100">
-                    {{-- Toevoegen aan mandje --}}
-                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
-                        @csrf
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit"
-                            class="w-full flex items-center justify-center gap-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
-                            </svg>
-                            Mandje
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <button type="button" onclick="updateCart({{ $product->id }}, -1)"
+                            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+                            −
                         </button>
-                    </form>
-                    {{-- Direct bestellen --}}
+                        <span id="qty-{{ $product->id }}" class="w-8 text-center text-sm font-semibold text-gray-800">
+                            {{ $cartQty[$product->id] ?? 0 }}
+                        </span>
+                        <button type="button" onclick="updateCart({{ $product->id }}, 1)"
+                            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+                            +
+                        </button>
+                        <span class="text-xs text-gray-400 ml-1">in mandje</span>
+                    </div>
                     <a href="{{ route('order.create', ['product_id' => $product->id]) }}"
-                        class="flex-1 text-center text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition">
-                        Direct
+                        class="block text-center text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition">
+                        Direct bestellen
                     </a>
                 </div>
                 @endif
@@ -144,5 +135,28 @@
         @endforeach
     </div>
     @endif
+
+<script>
+function updateCart(productId, change) {
+    const qtyEl = document.getElementById('qty-' + productId);
+    const currentQty = parseInt(qtyEl.textContent) || 0;
+    const newQty = Math.max(0, currentQty + change);
+
+    fetch('/cart/ajax/' + productId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ quantity: newQty })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            qtyEl.textContent = newQty;
+        }
+    });
+}
+</script>
 
 </x-app-layout>

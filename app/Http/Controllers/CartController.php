@@ -81,4 +81,19 @@ class CartController extends Controller
 
         return redirect()->route('order.index')->with('success', 'Bestelling geplaatst!');
     }
+    public function ajaxUpdate(Request $request, Product $product)
+{
+    $cart = session('cart', []);
+    $qty  = (int) $request->input('quantity', 0);
+
+    if ($qty <= 0) {
+        unset($cart[$product->id]);
+    } else {
+        $cart[$product->id] = $qty;
+    }
+
+    session(['cart' => $cart]);
+
+    return response()->json(['success' => true, 'quantity' => $qty]);
+}
 }

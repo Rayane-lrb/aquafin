@@ -109,5 +109,5 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
     Route::patch('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
 });
-
+Route::post('/cart/ajax/{product}', [App\Http\Controllers\CartController::class, 'ajaxUpdate'])->middleware('auth')->name('cart.ajax');
 require __DIR__.'/auth.php';

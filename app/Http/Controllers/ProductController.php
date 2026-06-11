@@ -22,12 +22,15 @@ class ProductController extends Controller
 
         $categories = ProductCategory::all();
 
-        return view('product.index', [
-            'products' => $products,
-            'query' => $query,
-            'categories' => $categories,
-            'selectedCategory' => $selectedCategory,
-        ]);
+       $cartQty = session('cart', []);
+
+return view('product.index', [
+    'products' => $products,
+    'query' => $query,
+    'categories' => $categories,
+    'selectedCategory' => $selectedCategory,
+    'cartQty' => $cartQty,
+]);
     }
 
     public function show($id)
