@@ -40,6 +40,10 @@
         </div>
     </form>
 
+    <p class="mb-4 text-sm text-gray-500">
+        {{ $products->count() }} {{ $products->count() === 1 ? 'beschikbaar product' : 'beschikbare producten' }}
+    </p>
+
     @if ($products->isEmpty())
         <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
             Geen producten gevonden.
