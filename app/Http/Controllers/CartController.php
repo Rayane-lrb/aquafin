@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -67,13 +68,18 @@ class CartController extends Controller
             return back()->with('error', 'Je mandje is leeg.');
         }
 
+        $groupId = (string) Str::uuid();
+        $urgent  = $request->boolean('urgent');
+
         foreach ($cart as $productId => $quantity) {
             Order::create([
-                'user_id'      => Auth::id(),
-                'product_id'   => $productId,
-                'quantity'     => $quantity,
-                'status'       => 'in behandeling',
-                'warehouse_id' => $request->warehouse_id,
+                'order_group_id' => $groupId,
+                'user_id'        => Auth::id(),
+                'product_id'     => $productId,
+                'quantity'       => $quantity,
+                'status'         => 'in behandeling',
+                'warehouse_id'   => $request->warehouse_id,
+                'urgent'         => $urgent,
             ]);
         }
 
