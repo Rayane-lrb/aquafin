@@ -43,14 +43,30 @@
                     <p class="text-xs text-gray-400">{{ optional($product->category)->name ?? '—' }}</p>
                 </div>
 
-                {{-- Aantal --}}
-                <form action="{{ route('cart.update', $product->id) }}" method="POST" class="flex items-center gap-2">
-                    @csrf
-                    @method('PATCH')
-                    <input type="number" name="quantity" value="{{ $qty }}" min="1"
-                        class="w-16 text-center text-sm border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500"
-                        onchange="this.form.submit()">
-                </form>
+               {{-- Aantal --}}
+<div class="flex items-center gap-1">
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="quantity" value="{{ max(1, $qty - 1) }}">
+        <button type="submit"
+            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+            −
+        </button>
+    </form>
+
+    <span class="w-8 text-center text-sm font-semibold text-gray-800">{{ $qty }}</span>
+
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="quantity" value="{{ $qty + 1 }}">
+        <button type="submit"
+            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+            +
+        </button>
+    </form>
+</div>
 
                 {{-- Verwijderen --}}
                 <form action="{{ route('cart.remove', $product->id) }}" method="POST">
