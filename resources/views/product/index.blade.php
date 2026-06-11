@@ -99,11 +99,11 @@
                             </svg>
                             Mandje
                         </a>
+                        <a href="{{ route('order.create', ['product_id' => $product->id]) }}"
+                            class="text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition whitespace-nowrap">
+                            Direct
+                        </a>
                     </div>
-                    <a href="{{ route('order.create', ['product_id' => $product->id]) }}"
-                        class="block text-center text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg transition">
-                        Direct bestellen
-                    </a>
                 </div>
                 @endif
 
