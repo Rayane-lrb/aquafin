@@ -20,21 +20,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'role' => 'admin',
             'password' => bcrypt('password'),
         ]);
 
-        User::factory()->create([
+        User::create([
             'name' => 'tech user',
             'email' => 'tech@user.com',
             'role' => 'technieker',
             'password' => bcrypt('password'),
         ]);
 
-        User::factory()->create([
+        User::create([
             'name' => 'magazijn user',
             'email' => 'mag@user.com',
             'role' => 'magazijnBeheerder',
