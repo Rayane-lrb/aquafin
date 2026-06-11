@@ -89,6 +89,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/order/{id}/approve', [OrderController::class, 'approve'])->name('order.approve');
     Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
     Route::patch('/order/{id}/deliver', [OrderController::class, 'deliver'])->name('order.deliver');
+    Route::patch('/order/{id}/urgent', [OrderController::class, 'toggleUrgent'])->name('order.urgent');
 
     // Suggestions
     Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
