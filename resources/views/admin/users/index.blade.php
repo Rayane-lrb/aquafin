@@ -36,6 +36,7 @@
                     </td>
                     <td class="px-6 py-4 flex items-center gap-3">
                         @if (Auth::user()?->role === 'admin')
+                        <div class="flex flex-row gap-2">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:underline">Bewerken</a>
 
                             @if (Auth::user()?->id !== $user->id)
