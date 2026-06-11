@@ -79,7 +79,10 @@
                     <td class="px-6 py-4 font-medium text-gray-900">{{ $order->product->name }}</td>
 
                     @if(Auth::user()->role !== 'technieker')
-                        <td class="px-6 py-4 text-gray-500">{{ $order->user->name }}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-gray-800 font-medium leading-tight">{{ $order->user->name }}</div>
+                            <div class="text-xs text-gray-400 mt-0.5">{{ $order->created_at->format('d/m/Y H:i') }}</div>
+                        </td>
                     @endif
 
                     <td class="px-6 py-4 text-gray-700">{{ $order->quantity }}</td>
