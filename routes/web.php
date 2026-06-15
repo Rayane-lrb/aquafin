@@ -82,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Orders
     Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+    Route::get('/order/magazijn', [OrderController::class, 'magazijn'])->name('order.magazijn');
     Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
     Route::post('/order', [OrderController::class, 'store'])->name('order.store');
     Route::get('/order/{id}/edit', [OrderController::class, 'edit'])->name('order.edit');
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
     Route::patch('/order/{id}/deliver', [OrderController::class, 'deliver'])->name('order.deliver');
     Route::patch('/order/{id}/urgent', [OrderController::class, 'toggleUrgent'])->name('order.urgent');
+    // Group actions (magazijn)
+    Route::patch('/order/group/{groupId}/approve', [OrderController::class, 'groupApprove'])->name('order.group.approve');
+    Route::patch('/order/group/{groupId}/reject', [OrderController::class, 'groupReject'])->name('order.group.reject');
+    Route::patch('/order/group/{groupId}/delivery-date', [OrderController::class, 'groupDeliveryDate'])->name('order.group.deliveryDate');
+    Route::patch('/order/group/{groupId}/deliver', [OrderController::class, 'groupDeliver'])->name('order.group.deliver');
 
 });
 
