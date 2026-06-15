@@ -13,11 +13,12 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cart       = session('cart', []);
-        $products   = Product::findMany(array_keys($cart));
-        $warehouses = Warehouse::all();
+        $cart               = session('cart', []);
+        $products           = Product::findMany(array_keys($cart));
+        $warehouses         = Warehouse::orderBy('name')->get();
+        $defaultWarehouseId = auth()->user()->default_warehouse_id;
 
-        return view('cart.index', compact('cart', 'products', 'warehouses'));
+        return view('cart.index', compact('cart', 'products', 'warehouses', 'defaultWarehouseId'));
     }
 
     public function add(Request $request, Product $product)
