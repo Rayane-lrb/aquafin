@@ -48,9 +48,22 @@
                             </option>
                         @endforeach
                     </select>
+                    
                     @error('product_category_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
-
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Weersomstandigheden</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 text-sm text-gray-600">
+                            <input name="is_flood_tool" type="checkbox" value="1" {{ $product->is_flood_tool ? 'checked' : '' }}>
+                            Overstromingsmateriaal
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-gray-600">
+                            <input name="needed_on_rain" type="checkbox" value="1" {{ $product->needed_on_rain ? 'checked' : '' }}>
+                            Regenmateriaal
+                        </label>
+                    </div>
+                </div>
                 <div class="flex gap-3">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
                         Bijwerken

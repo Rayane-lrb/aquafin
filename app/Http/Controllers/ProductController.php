@@ -45,8 +45,8 @@ public function index(Request $request)
         $hours      = $daily['precipitation_hours'][0] ?? 0;
         $probability = $daily['precipitation_probability_max'][0] ?? 0;
 
-        $isRainy    = true;
-        $isFlooding = false;
+        $isRainy    = $precip > 2 || $probability > 50;
+        $isFlooding = $precip > 20 || $hours > 6;
 
         if ($isFlooding) {
             $weatherAlert = 'flood';
@@ -128,7 +128,7 @@ public function index(Request $request)
         return redirect()->route('product.index');
     }
 
-    public function update(Request $request, string $id)
+        public function update(Request $request, string $id)
     {
         $product = Product::findOrFail($id);
 
@@ -141,6 +141,8 @@ public function index(Request $request)
         ]);
 
         $data = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
+        $data['is_flood_tool']  = $request->boolean('is_flood_tool');
+        $data['needed_on_rain'] = $request->boolean('needed_on_rain');  // ← cette ligne manque probablement
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
