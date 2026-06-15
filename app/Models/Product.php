@@ -13,6 +13,11 @@ class Product extends Model
 
     protected $fillable = ['name', 'barcode', 'image', 'stock', 'is_active', 'is_flood_tool', 'product_category_id'];
 
+    protected $casts = [
+    'is_active'      => 'boolean',
+    'is_flood_tool'  => 'boolean',
+    'needed_on_rain' => 'boolean'];
+
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);

@@ -40,6 +40,26 @@
         </div>
     </form>
 
+        {{-- Weersuggesties --}}
+    @if(isset($weatherAlert) && $weatherAlert !== 'none' && $suggestedProducts->isNotEmpty())
+    <div class="mb-4 p-4 rounded-xl border {{ $weatherAlert === 'flood' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200' }}">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">{{ $weatherAlert === 'flood' ? '🌊' : '🌧️' }}</span>
+            <h2 class="font-semibold text-sm {{ $weatherAlert === 'flood' ? 'text-red-700' : 'text-blue-700' }}">
+                {{ $weatherAlert === 'flood' ? 'Overstromingsrisico vandaag' : 'Regendag vandaag' }} — Aanbevolen materialen:
+            </h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            @foreach($suggestedProducts as $product)
+                <span class="text-xs font-medium px-3 py-1.5 rounded-full border
+                    {{ $weatherAlert === 'flood' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-100 text-blue-700 border-blue-200' }}">
+                    ⭐ {{ $product->name }}
+                </span>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    
     <p class="mb-4 text-sm text-gray-500">
         {{ $products->count() }} {{ $products->count() === 1 ? 'beschikbaar product' : 'beschikbare producten' }}
     </p>
