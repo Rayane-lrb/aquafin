@@ -24,7 +24,7 @@ public function index(Request $request)
         }))
         ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
         ->get();
-
+        
     $categories = ProductCategory::all();
     $cartQty = session('cart', []);
 

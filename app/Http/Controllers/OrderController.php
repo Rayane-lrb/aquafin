@@ -21,7 +21,10 @@ class OrderController extends Controller
             })
             ->when($query, function ($q) use ($query) {
                 $q->where(function ($sub) use ($query) {
-                    $sub->where('order_id', 'LIKE', "%{$query}%")
+                    $sub->where('status', 'LIKE', "%{$query}%")
+                        ->orWhereHas('product', function ($s) use ($query) {
+                            $s->where('name', 'LIKE', "%{$query}%");
+                        })
                         ->orWhereHas('user', function ($s) use ($query) {
                             $s->where('name', 'LIKE', "%{$query}%");
                         });
@@ -32,14 +35,13 @@ class OrderController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // Group by user; groups with urgent orders come first
         $grouped = $orders
             ->groupBy('user_id')
             ->sortByDesc(fn ($g) => $g->max('urgent') ? 1 : 0);
 
         return view('order.index', [
             'grouped' => $grouped,
-            'orders'  => $orders,   // kept for tab counts
+            'orders'  => $orders,
             'query'   => $query,
         ]);
     }
