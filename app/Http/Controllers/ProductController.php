@@ -58,6 +58,7 @@ return view('product.index', [
         return view('product.edit', ['product' => $product, 'categories' => $categories]);
     }
 
+    
     public function store(Request $request)
     {
         $request->validate([
