@@ -415,6 +415,8 @@ function addRecommended(productId) {
     .then(res => res.json())
     .then(() => { closeModal(); showToast('Product toegevoegd aan het mandje!'); });
 }
+
+
 </script>
 
 </x-app-layout>
