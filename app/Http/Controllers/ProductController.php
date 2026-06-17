@@ -10,29 +10,46 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->input('search');
+        $query            = $request->input('search');
         $selectedCategory = $request->input('category');
-        $role = auth()->user()?->role;
+        $role             = auth()->user()?->role;
+        $showCategories   = ! $query && ! $selectedCategory;
 
-        $products = Product::query()
-            ->when($role === 'technieker', fn ($q) => $q->where('is_active', true))
-            ->when($query, fn ($q) => $q->where(function ($sub) use ($query) {
-                $sub->where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('barcode', 'LIKE', "%{$query}%");
-            }))
-            ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
-            ->get();
+        // Catégories avec image aléatoire et compteur de produits
+        $categories = ProductCategory::all()->map(function ($cat) use ($role) {
+            $q = Product::where('product_category_id', $cat->id)
+                ->when($role === 'technieker', fn ($q) => $q->where('is_active', true));
 
-        $categories = ProductCategory::all();
+            $cat->product_count = $q->count();
+            $cat->preview_image = (clone $q)->whereNotNull('image')->inRandomOrder()->value('image');
+            return $cat;
+        });
 
-        $cartQty = session('cart', []);
+        $products = collect();
+        if (! $showCategories) {
+            $products = Product::query()
+                ->when($role === 'technieker', fn ($q) => $q->where('is_active', true))
+                ->when($query, fn ($q) => $q->where(function ($sub) use ($query) {
+                    $sub->where('name', 'LIKE', "%{$query}%")
+                        ->orWhere('barcode', 'LIKE', "%{$query}%");
+                }))
+                ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
+                ->get();
+        }
+
+        $cartQty        = session('cart', []);
+        $favoriteIds    = auth()->user()->favoriteProducts()->pluck('products.id')->flip();
+        $favoriteProducts = auth()->user()->favoriteProducts()->where('is_active', true)->get();
 
         return view('product.index', [
-            'products' => $products,
-            'query' => $query,
-            'categories' => $categories,
+            'products'         => $products,
+            'query'            => $query,
+            'categories'       => $categories,
             'selectedCategory' => $selectedCategory,
-            'cartQty' => $cartQty,
+            'cartQty'          => $cartQty,
+            'showCategories'   => $showCategories,
+            'favoriteIds'      => $favoriteIds,
+            'favoriteProducts' => $favoriteProducts,
         ]);
     }
 
