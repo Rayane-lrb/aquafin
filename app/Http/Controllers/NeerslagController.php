@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Http;
 
 class NeerslagController extends Controller
 {
-    // Coördinaten Antwerpen (Aquafin hoofdkantoor)
     private float $lat = 51.2194;
     private float $lon = 4.4025;
 
@@ -31,7 +30,7 @@ class NeerslagController extends Controller
         $hourly  = $data['hourly']  ?? [];
         $daily   = $data['daily']   ?? [];
 
-        // Alleen de komende 24 uur van hourly
+
         $now        = now()->setTimezone('Europe/Brussels');
         $hoursToday = [];
 
@@ -46,7 +45,6 @@ class NeerslagController extends Controller
             }
         }
 
-        // Dagelijkse samenvatting
         $days = [];
         foreach ($daily['time'] as $i => $date) {
             $days[] = [
