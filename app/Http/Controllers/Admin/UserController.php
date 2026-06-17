@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderByRaw("FIELD(role, 'admin', 'magazijnBeheerder', 'technieker')")->get();
+        $users = User::when($request->filled('search'), fn ($q) => $q
+            ->where('name', 'like', '%'.$request->search.'%')
+            ->orWhere('email', 'like', '%'.$request->search.'%'))
+            ->orderByRaw("FIELD(role, 'admin', 'magazijnBeheerder', 'technieker')")
+            ->get();
 
         return view('admin.users.index', ['users' => $users]);
     }

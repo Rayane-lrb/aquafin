@@ -58,7 +58,6 @@ class ProductController extends Controller
         return view('product.edit', ['product' => $product, 'categories' => $categories]);
     }
 
-    
     public function store(Request $request)
     {
         $request->validate([

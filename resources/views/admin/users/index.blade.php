@@ -10,6 +10,12 @@
         @endif
     </div>
 
+    <form method="GET" class="mb-4">
+        <input type="text" name="search" value="{{ request('search') }}"
+               placeholder="Zoek op naam of e-mail..."
+               class="w-full sm:w-72 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+    </form>
+
     <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">

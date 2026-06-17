@@ -16,7 +16,7 @@
             <a href="{{ route('product.index') }}" class="mt-3 inline-block text-sm text-blue-600 hover:underline">← Terug naar catalogus</a>
         </div>
 
-        @if ($orderHistory->isNotEmpty())
+        @if (Auth::user()?->role === 'admin' && $orderHistory->isNotEmpty())
             <div class="mt-8">
                 <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Eerdere bestellingen</h3>
                 <div class="space-y-2">
