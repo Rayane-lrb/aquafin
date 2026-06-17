@@ -15,6 +15,36 @@
             <p class="font-medium text-gray-500">Je mandje is leeg</p>
             <a href="{{ route('product.index') }}" class="mt-3 inline-block text-sm text-blue-600 hover:underline">← Terug naar catalogus</a>
         </div>
+
+        @if ($orderHistory->isNotEmpty())
+            <div class="mt-8">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Eerdere bestellingen</h3>
+                <div class="space-y-2">
+                    @foreach ($orderHistory as $groupId => $orders)
+                        @php $firstOrder = $orders->first(); @endphp
+                        <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                            <button @click="open = !open"
+                                class="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <span class="font-medium">{{ $firstOrder->created_at->isoFormat('D MMMM YYYY') }}</span>
+                                <svg x-bind:class="open ? 'rotate-180' : ''" class="w-4 h-4 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div x-show="open" x-collapse class="border-t border-gray-100">
+                                <ul class="divide-y divide-gray-50">
+                                    @foreach ($orders as $order)
+                                        <li class="flex items-center justify-between px-4 py-2.5 text-sm">
+                                            <span class="text-gray-600">{{ $order->product?->name ?? 'Onbekend product' }}</span>
+                                            <span class="font-semibold text-gray-800">{{ $order->quantity }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     @else
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
