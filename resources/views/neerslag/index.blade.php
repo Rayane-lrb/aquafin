@@ -54,6 +54,54 @@
 
     </div>
 
+    {{-- Aanbevolen producten op basis van neerslag --}}
+    @if ($rainLevel !== 'droog' && $recommendedProducts->isNotEmpty())
+    @php
+        $levelConfig = match ($rainLevel) {
+            'zwaar' => ['label' => 'Zware regen verwacht', 'icon' => '⛈️', 'color' => 'blue', 'tip' => 'Bij zware neerslag zijn pompen, leidingen en inspectiecamera\'s essentieel.'],
+            'matig' => ['label' => 'Matige regen verwacht', 'icon' => '🌧️', 'color' => 'sky', 'tip' => 'Controleer afvoerleidingen en zorg voor afdichtingsmaterialen.'],
+            'licht' => ['label' => 'Lichte regen verwacht', 'icon' => '🌦️', 'color' => 'indigo', 'tip' => 'Handige materialen voor lichte weersomstandigheden.'],
+            default => ['label' => '', 'icon' => '', 'color' => 'gray', 'tip' => ''],
+        };
+    @endphp
+    <div class="bg-white rounded-2xl shadow-sm border border-{{ $levelConfig['color'] }}-200 p-6 mb-6">
+        <div class="flex items-center gap-3 mb-1">
+            <span class="text-2xl">{{ $levelConfig['icon'] }}</span>
+            <div>
+                <h2 class="text-sm font-semibold text-gray-800">{{ $levelConfig['label'] }} — Aanbevolen producten</h2>
+                <p class="text-xs text-gray-400">{{ $levelConfig['tip'] }}</p>
+            </div>
+        </div>
+
+        <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            @foreach ($recommendedProducts as $product)
+            <a href="{{ route('product.show', $product->id) }}"
+               class="group bg-gray-50 rounded-xl p-3 hover:bg-{{ $levelConfig['color'] }}-50 hover:shadow-sm transition flex flex-col items-center text-center gap-2">
+                <div class="w-14 h-14 flex items-center justify-center">
+                    @if ($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}"
+                             alt="{{ $product->name }}"
+                             class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200">
+                    @else
+                        <div class="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0v10l-8 4m0-10L4 7m8 4v10"/></svg>
+                        </div>
+                    @endif
+                </div>
+                <p class="text-xs font-medium text-gray-700 leading-tight line-clamp-2">{{ $product->name }}</p>
+                <span class="text-xs text-gray-400">{{ $product->stock }} op stock</span>
+            </a>
+            @endforeach
+        </div>
+
+        <div class="mt-4 text-right">
+            <a href="{{ route('product.index') }}" class="text-xs text-{{ $levelConfig['color'] }}-600 hover:underline font-medium">
+                Alle producten bekijken →
+            </a>
+        </div>
+    </div>
+    @endif
+
     {{-- Gemiddelde neerslag deze week --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <h2 class="text-sm font-semibold text-gray-800 mb-5">Gemiddelde neerslag deze week</h2>
