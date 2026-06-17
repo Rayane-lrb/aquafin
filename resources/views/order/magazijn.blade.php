@@ -20,7 +20,7 @@
     <div class="flex flex-wrap gap-3 mb-8">
         @if($urgentCount > 0)
         <div class="flex items-center gap-2 bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow animate-pulse">
-            🚨 {{ $urgentCount }} urgent{{ $urgentCount > 1 ? 'e' : '' }}
+            🚨 {{ $urgentCount }} DRINGEND{{ $urgentCount > 1 ? 'E' : '' }}
         </div>
         @endif
         <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm font-medium px-4 py-2 rounded-xl">
@@ -57,7 +57,7 @@
                 {{-- Bannière urgent --}}
                 @if($urgent)
                     <div class="bg-red-600 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-                        🚨 URGENTE BESTELLING — voorrangsbehandeling vereist
+                        🚨 DRINGENDE BESTELLING — voorrangsbehandeling vereist
                     </div>
                 @endif
 
@@ -164,7 +164,7 @@
 
                 @if($urgent)
                     <div class="bg-red-600 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-                        🚨 URGENT
+                        🚨 DRINGEND
                     </div>
                 @endif
 
