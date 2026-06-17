@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Notifications\OrderStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -125,6 +126,7 @@ class OrderController extends Controller
 
         $product->decrement('stock', $order->quantity);
         $order->update(['status' => OrderStatus::Approved->value]);
+        $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'status' => OrderStatus::Approved->value, 'order_id' => $order->id]);
@@ -137,6 +139,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $order->update(['status' => OrderStatus::Rejected->value]);
+        $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'status' => OrderStatus::Rejected->value, 'order_id' => $order->id]);
@@ -164,6 +167,7 @@ class OrderController extends Controller
         }
 
         $order->update(['status' => OrderStatus::Delivered->value]);
+        $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'status' => OrderStatus::Delivered->value, 'order_id' => $order->id]);
@@ -226,6 +230,7 @@ class OrderController extends Controller
             if ($order->product->stock >= $order->quantity) {
                 $order->product->decrement('stock', $order->quantity);
                 $order->update(['status' => OrderStatus::Approved->value]);
+                $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
             }
         }
 
@@ -253,9 +258,15 @@ class OrderController extends Controller
 
     public function groupDeliver(Request $request, string $groupId)
     {
-        Order::where('order_group_id', $groupId)
+        $toDeliver = Order::where('order_group_id', $groupId)
             ->where('status', OrderStatus::Approved->value)
-            ->update(['status' => OrderStatus::Delivered->value]);
+            ->with(['user', 'product'])
+            ->get();
+
+        foreach ($toDeliver as $order) {
+            $order->update(['status' => OrderStatus::Delivered->value]);
+            $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
+        }
 
         return redirect()->route('order.magazijn')->with('success', 'Bestelling afgeleverd.');
     }
