@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PrecipitationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
@@ -104,5 +105,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 });
 Route::post('/cart/ajax/{product}', [CartController::class, 'ajaxUpdate'])->middleware('auth')->name('cart.ajax');
+Route::post('/favorites/{product}', [FavoriteController::class, 'toggle'])->middleware('auth')->name('favorites.toggle');
+Route::post('/notifications/read-all', fn () => auth()->user()->unreadNotifications->markAsRead())->middleware('auth')->name('notifications.readAll');
 
 require __DIR__.'/auth.php';
