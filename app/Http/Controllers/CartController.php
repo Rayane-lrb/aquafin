@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Warehouse;
@@ -85,7 +86,7 @@ class CartController extends Controller
                 'user_id' => Auth::id(),
                 'product_id' => $productId,
                 'quantity' => $quantity,
-                'status' => 'in behandeling',
+                'status' => OrderStatus::Pending->value,
                 'warehouse_id' => $request->warehouse_id,
                 'urgent' => $urgent,
             ]);
