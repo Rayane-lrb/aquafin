@@ -2,14 +2,12 @@
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\NeerslagController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PrecipitationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\Userzone\ProfileController;
-use App\Http\Controllers\Userzone\SuggestionController;
+use App\Http\Controllers\WarehouseController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -111,6 +109,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 });
-Route::post('/cart/ajax/{product}', [App\Http\Controllers\CartController::class, 'ajaxUpdate'])->middleware('auth')->name('cart.ajax');
+Route::post('/cart/ajax/{product}', [CartController::class, 'ajaxUpdate'])->middleware('auth')->name('cart.ajax');
 
 require __DIR__.'/auth.php';
