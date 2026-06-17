@@ -13,7 +13,7 @@ class ProductFromImagesSeeder extends Seeder
     public function run(): void
     {
         $sourceDir = public_path('images/material_pics');
-        $destDir   = storage_path('app/public/products');
+        $destDir = storage_path('app/public/products');
 
         File::ensureDirectoryExists($destDir);
 
@@ -21,6 +21,7 @@ class ProductFromImagesSeeder extends Seeder
 
         if ($images->isEmpty()) {
             $this->command->error("Geen afbeeldingen gevonden in: {$sourceDir}");
+
             return;
         }
 
@@ -36,6 +37,7 @@ class ProductFromImagesSeeder extends Seeder
                 $this->command->info('Categorie "Algemeen" aangemaakt.');
             } else {
                 $this->command->error('Seeder gestopt: geen categorie beschikbaar.');
+
                 return;
             }
         } else {
@@ -48,6 +50,7 @@ class ProductFromImagesSeeder extends Seeder
 
             if (! ProductCategory::find($categoryId)) {
                 $this->command->error("Categorie ID {$categoryId} bestaat niet.");
+
                 return;
             }
         }
@@ -56,27 +59,28 @@ class ProductFromImagesSeeder extends Seeder
         $skipped = 0;
 
         foreach ($images as $file) {
-            $filename    = $file->getFilename();
+            $filename = $file->getFilename();
             $productName = $this->prettifyName($file->getFilenameWithoutExtension());
 
             // Skip als product al bestaat
             if (Product::whereRaw('LOWER(name) = ?', [Str::lower($productName)])->exists()) {
                 $this->command->line("  <fg=gray>⏭  {$productName} (bestaat al)</>");
                 $skipped++;
+
                 continue;
             }
 
             // Kopieer afbeelding naar storage
-            $destPath = $destDir . DIRECTORY_SEPARATOR . $filename;
+            $destPath = $destDir.DIRECTORY_SEPARATOR.$filename;
             File::copy($file->getPathname(), $destPath);
 
             Product::create([
-                'name'                => $productName,
-                'stock'               => 0,
-                'is_active'           => true,
-                'is_flood_tool'       => false,
+                'name' => $productName,
+                'stock' => 0,
+                'is_active' => true,
+                'is_flood_tool' => false,
                 'product_category_id' => $categoryId,
-                'image'               => 'products/' . $filename,
+                'image' => 'products/'.$filename,
             ]);
 
             $this->command->line("  <fg=green>✓  {$productName}</>");

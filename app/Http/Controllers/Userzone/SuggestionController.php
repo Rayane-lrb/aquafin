@@ -13,12 +13,12 @@ class SuggestionController extends Controller
 {
     public function index()
     {
-    $suggestions = Suggestion::with('user')
-        ->when(auth()->user()->role === 'technieker', function ($q) {
-            $q->where('user_id', auth()->id());
-        })
-        ->latest()
-        ->get();
+        $suggestions = Suggestion::with('user')
+            ->when(auth()->user()->role === 'technieker', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
+            ->latest()
+            ->get();
 
         return view('suggestion.index', ['suggestions' => $suggestions]);
     }
@@ -39,16 +39,16 @@ class SuggestionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image'       => ['nullable', 'image', 'max:5120'],
+            'image' => ['nullable', 'image', 'max:5120'],
         ]);
 
         $data = [
-            'user_id'     => Auth::id(),
-            'title'       => $request->title,
+            'user_id' => Auth::id(),
+            'title' => $request->title,
             'description' => $request->description,
-            'status'      => 'in behandeling',
+            'status' => 'in behandeling',
         ];
 
         if ($request->hasFile('image')) {
@@ -88,11 +88,11 @@ class SuggestionController extends Controller
         ]);
 
         Product::create([
-            'name'                => $suggestion->title,
-            'image'               => $suggestion->image,
-            'stock'               => 0,
-            'is_active'           => true,
-            'is_flood_tool'       => false,
+            'name' => $suggestion->title,
+            'image' => $suggestion->image,
+            'stock' => 0,
+            'is_active' => true,
+            'is_flood_tool' => false,
             'product_category_id' => $request->product_category_id,
         ]);
 
