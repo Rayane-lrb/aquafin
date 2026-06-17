@@ -20,20 +20,7 @@
             + Nieuwe bestelling
         </a>
     </div>
-    
-    <form action="{{ route('order.index') }}" method="GET" class="flex gap-2 flex-1 min-w-0">
-        <input type="text" name="q" value="{{ $query }}"
-            placeholder="Zoek een product..."
-            class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-            Zoeken
-        </button>
-        @if ($query)
-            <a href="{{ route('order.index') }}" class="text-sm text-gray-400 hover:text-gray-600 px-3 py-2 rounded-lg border border-gray-200 transition">
-                ✕ Reset
-            </a>
-        @endif
-    </form>
+
     {{-- Status filter tabs (client-side, geen reload) --}}
     @php
         $tabs = [

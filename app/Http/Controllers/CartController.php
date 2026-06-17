@@ -13,12 +13,11 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cart               = session('cart', []);
-        $products           = Product::findMany(array_keys($cart));
-        $warehouses         = Warehouse::orderBy('name')->get();
-        $defaultWarehouseId = auth()->user()->default_warehouse_id;
+        $cart       = session('cart', []);
+        $products   = Product::findMany(array_keys($cart));
+        $warehouses = Warehouse::all();
 
-        return view('cart.index', compact('cart', 'products', 'warehouses', 'defaultWarehouseId'));
+        return view('cart.index', compact('cart', 'products', 'warehouses'));
     }
 
     public function add(Request $request, Product $product)
@@ -89,24 +88,18 @@ class CartController extends Controller
         return redirect()->route('order.index')->with('success', 'Bestelling geplaatst!');
     }
     public function ajaxUpdate(Request $request, Product $product)
-    {
-        $cart = session('cart', []);
-        $qty  = (int) $request->input('quantity', 0);
+{
+    $cart = session('cart', []);
+    $qty  = (int) $request->input('quantity', 0);
 
-        if ($qty <= 0) {
-            unset($cart[$product->id]);
-        } else {
-            $cart[$product->id] = $qty;
-        }
-
-        session(['cart' => $cart]);
-
-        return response()->json([
-            'success'        => true,
-            'quantity'       => max(0, $qty),
-            'productCount'   => count($cart),
-            'totalQuantity'  => array_sum($cart),
-            'removed'        => $qty <= 0,
-        ]);
+    if ($qty <= 0) {
+        unset($cart[$product->id]);
+    } else {
+        $cart[$product->id] = $qty;
     }
+
+    session(['cart' => $cart]);
+
+    return response()->json(['success' => true, 'quantity' => $qty]);
+}
 }

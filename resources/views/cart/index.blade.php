@@ -17,13 +17,13 @@
         </div>
     @else
 
-    <div id="cart-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- Producten --}}
-        <div id="cart-items" class="lg:col-span-2 space-y-3">
+        <div class="lg:col-span-2 space-y-3">
             @foreach ($products as $product)
             @php $qty = $cart[$product->id] ?? 1; @endphp
-            <div id="cart-item-{{ $product->id }}" class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4">
+            <div class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4">
 
                 {{-- Foto --}}
                 @if ($product->image)
@@ -43,30 +43,47 @@
                     <p class="text-xs text-gray-400">{{ optional($product->category)->name ?? '—' }}</p>
                 </div>
 
-                {{-- Aantal --}}
-                <div class="flex items-center gap-1">
-                    <button type="button" onclick="updateCartQty({{ $product->id }}, -1)"
-                        class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
-                        −
-                    </button>
+               {{-- Aantal --}}
+<div class="flex items-center gap-1">
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="quantity" value="{{ max(1, $qty - 1) }}">
+        <button type="submit"
+            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+            −
+        </button>
+    </form>
 
-                    <input type="number" id="cart-qty-{{ $product->id }}" value="{{ $qty }}" min="1"
-                        class="w-14 text-center text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-1 py-1"
-                        onchange="setCartQty({{ $product->id }}, this.value)">
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="number" name="quantity" value="{{ $qty }}" min="1"
+            class="w-14 text-center text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-1 py-1"
+            onchange="this.form.submit()">
+    </form>
 
-                    <button type="button" onclick="updateCartQty({{ $product->id }}, 1)"
-                        class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
-                        +
-                    </button>
-                </div>
+    <form action="{{ route('cart.update', $product->id) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="quantity" value="{{ $qty + 1 }}">
+        <button type="submit"
+            class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition">
+            +
+        </button>
+    </form>
+</div>
 
                 {{-- Verwijderen --}}
-                <button type="button" onclick="removeCartItem({{ $product->id }})"
-                    class="p-1.5 text-gray-300 hover:text-red-500 transition rounded-lg hover:bg-red-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+                <form action="{{ route('cart.remove', $product->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="p-1.5 text-gray-300 hover:text-red-500 transition rounded-lg hover:bg-red-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
             @endforeach
         </div>
@@ -80,12 +97,7 @@
                     @csrf
 
                     <div>
-                        <label class="block text-xs text-gray-500 mb-1.5 font-medium">
-                            Leveringsmagazijn
-                            @if ($defaultWarehouseId)
-                                <span class="ml-1 text-blue-500">⭐ standaard ingevuld</span>
-                            @endif
-                        </label>
+                        <label class="block text-xs text-gray-500 mb-1.5 font-medium">Leveringsmagazijn</label>
                         @if ($warehouses->isEmpty())
                             <p class="text-xs text-red-500">Geen magazijnen beschikbaar. Vraag een beheerder er een toe te voegen.</p>
                         @else
@@ -93,10 +105,7 @@
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
                                 <option value="">Kies een magazijn...</option>
                                 @foreach ($warehouses as $w)
-                                    <option value="{{ $w->id }}"
-                                        {{ old('warehouse_id', $defaultWarehouseId) == $w->id ? 'selected' : '' }}>
-                                        {{ $w->name }}{{ $w->address ? ' — ' . $w->address : '' }}
-                                    </option>
+                                    <option value="{{ $w->id }}">{{ $w->name }}{{ $w->address ? ' — ' . $w->address : '' }}</option>
                                 @endforeach
                             </select>
                             @error('warehouse_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -117,11 +126,11 @@
                     <div class="border-t border-gray-100 pt-3">
                         <div class="flex justify-between text-sm text-gray-600 mb-1">
                             <span>Producten</span>
-                            <span id="cart-product-count">{{ count($cart) }}</span>
+                            <span>{{ count($cart) }}</span>
                         </div>
                         <div class="flex justify-between text-sm text-gray-600">
                             <span>Totaal stuks</span>
-                            <span id="cart-total-qty">{{ array_sum($cart) }}</span>
+                            <span>{{ array_sum($cart) }}</span>
                         </div>
                     </div>
 
@@ -137,84 +146,6 @@
             </div>
         </div>
     </div>
-    @endif
-
-    @if (!empty($cart))
-    <script>
-    function updateCartOnServer(productId, quantity) {
-        return fetch('/cart/ajax/' + productId, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ quantity }),
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Cart update failed');
-                return res.json();
-            });
-    }
-
-    function applyCartResponse(productId, data) {
-        if (!data.success) return;
-
-        const qtyEl = document.getElementById('cart-qty-' + productId);
-        const itemEl = document.getElementById('cart-item-' + productId);
-        const productCountEl = document.getElementById('cart-product-count');
-        const totalQtyEl = document.getElementById('cart-total-qty');
-        const navBadge = document.getElementById('nav-cart-badge');
-
-        if (data.removed) {
-            itemEl?.remove();
-        } else if (qtyEl) {
-            qtyEl.value = data.quantity;
-        }
-
-        if (productCountEl) productCountEl.textContent = data.productCount;
-        if (totalQtyEl) totalQtyEl.textContent = data.totalQuantity;
-
-        if (navBadge) {
-            if (data.totalQuantity > 0) {
-                navBadge.textContent = data.totalQuantity;
-                navBadge.classList.remove('hidden');
-            } else {
-                navBadge.classList.add('hidden');
-            }
-        }
-
-        if (data.productCount === 0) {
-            window.location.reload();
-        }
-    }
-
-    function updateCartQty(productId, change) {
-        const qtyEl = document.getElementById('cart-qty-' + productId);
-        const currentQty = parseInt(qtyEl.value, 10) || 1;
-        const newQty = change < 0 ? Math.max(1, currentQty + change) : currentQty + change;
-
-        updateCartOnServer(productId, newQty)
-            .then(data => applyCartResponse(productId, data))
-            .catch(() => window.location.reload());
-    }
-
-    function setCartQty(productId, value) {
-        const newQty = Math.max(1, parseInt(value, 10) || 1);
-        const qtyEl = document.getElementById('cart-qty-' + productId);
-        if (qtyEl) qtyEl.value = newQty;
-
-        updateCartOnServer(productId, newQty)
-            .then(data => applyCartResponse(productId, data))
-            .catch(() => window.location.reload());
-    }
-
-    function removeCartItem(productId) {
-        updateCartOnServer(productId, 0)
-            .then(data => applyCartResponse(productId, data))
-            .catch(() => window.location.reload());
-    }
-    </script>
     @endif
 
 </x-app-layout>
