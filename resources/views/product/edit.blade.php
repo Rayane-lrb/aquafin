@@ -16,9 +16,9 @@
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Barcode</label>
-                    <input type="text" name="barcode" value="{{ old('barcode', $product->barcode) }}"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    @error('barcode') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <p class="font-mono font-semibold tracking-widest text-gray-800 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        {{ $product->barcode ?? '—' }}
+                    </p>
                 </div>
 
                 <div class="mb-4">
