@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Warehouse;
@@ -68,7 +69,7 @@ class OrderController extends Controller
             'user_id' => Auth::id(),
             'product_id' => $request->product_id,
             'quantity' => $request->quantity,
-            'status' => 'in behandeling',
+            'status' => OrderStatus::Pending->value,
             'warehouse_id' => $request->warehouse_id,
         ]);
 
@@ -123,10 +124,10 @@ class OrderController extends Controller
         }
 
         $product->decrement('stock', $order->quantity);
-        $order->update(['status' => 'goedgekeurd']);
+        $order->update(['status' => OrderStatus::Approved->value]);
 
         if ($request->wantsJson()) {
-            return response()->json(['success' => true, 'status' => 'goedgekeurd', 'order_id' => $order->id]);
+            return response()->json(['success' => true, 'status' => OrderStatus::Approved->value, 'order_id' => $order->id]);
         }
 
         return redirect()->route('order.index');
@@ -135,10 +136,10 @@ class OrderController extends Controller
     public function reject(Request $request, string $id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['status' => 'afgekeurd']);
+        $order->update(['status' => OrderStatus::Rejected->value]);
 
         if ($request->wantsJson()) {
-            return response()->json(['success' => true, 'status' => 'afgekeurd', 'order_id' => $order->id]);
+            return response()->json(['success' => true, 'status' => OrderStatus::Rejected->value, 'order_id' => $order->id]);
         }
 
         return redirect()->route('order.index');
@@ -154,7 +155,7 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
 
-        if ($order->status !== 'goedgekeurd') {
+        if ($order->status !== OrderStatus::Approved->value) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Enkel goedgekeurde bestellingen kunnen afgeleverd worden.'], 422);
             }
@@ -162,10 +163,10 @@ class OrderController extends Controller
             return redirect()->route('order.index')->with('error', 'Enkel goedgekeurde bestellingen kunnen afgeleverd worden.');
         }
 
-        $order->update(['status' => 'geleverd']);
+        $order->update(['status' => OrderStatus::Delivered->value]);
 
         if ($request->wantsJson()) {
-            return response()->json(['success' => true, 'status' => 'geleverd', 'order_id' => $order->id]);
+            return response()->json(['success' => true, 'status' => OrderStatus::Delivered->value, 'order_id' => $order->id]);
         }
 
         return redirect()->route('order.index')->with('success', 'Bestelling gemarkeerd als geleverd.');
@@ -198,9 +199,9 @@ class OrderController extends Controller
             ->groupBy(fn ($o) => $o->order_group_id ?? 'solo-'.$o->id)
             ->sortByDesc(fn ($g) => $g->max('urgent') ? 1 : 0);
 
-        $pending = (clone $base)->where('status', 'in behandeling')->orderByDesc('urgent')->get();
-        $approved = (clone $base)->where('status', 'goedgekeurd')->orderByDesc('urgent')->get();
-        $archive = (clone $base)->whereIn('status', ['geleverd', 'afgekeurd'])->latest()->get();
+        $pending  = (clone $base)->where('status', OrderStatus::Pending->value)->orderByDesc('urgent')->get();
+        $approved = (clone $base)->where('status', OrderStatus::Approved->value)->orderByDesc('urgent')->get();
+        $archive  = (clone $base)->whereIn('status', [OrderStatus::Delivered->value, OrderStatus::Rejected->value])->latest()->get();
 
         return view('order.magazijn', [
             'pendingGroups' => $groupFn($pending),
@@ -217,14 +218,14 @@ class OrderController extends Controller
     public function groupApprove(Request $request, string $groupId)
     {
         $orders = Order::where('order_group_id', $groupId)
-            ->where('status', 'in behandeling')
+            ->where('status', OrderStatus::Pending->value)
             ->with('product')
             ->get();
 
         foreach ($orders as $order) {
             if ($order->product->stock >= $order->quantity) {
                 $order->product->decrement('stock', $order->quantity);
-                $order->update(['status' => 'goedgekeurd']);
+                $order->update(['status' => OrderStatus::Approved->value]);
             }
         }
 
@@ -234,8 +235,8 @@ class OrderController extends Controller
     public function groupReject(Request $request, string $groupId)
     {
         Order::where('order_group_id', $groupId)
-            ->where('status', 'in behandeling')
-            ->update(['status' => 'afgekeurd']);
+            ->where('status', OrderStatus::Pending->value)
+            ->update(['status' => OrderStatus::Rejected->value]);
 
         return redirect()->route('order.magazijn')->with('success', 'Alle bestellingen geweigerd.');
     }
@@ -253,8 +254,8 @@ class OrderController extends Controller
     public function groupDeliver(Request $request, string $groupId)
     {
         Order::where('order_group_id', $groupId)
-            ->where('status', 'goedgekeurd')
-            ->update(['status' => 'geleverd']);
+            ->where('status', OrderStatus::Approved->value)
+            ->update(['status' => OrderStatus::Delivered->value]);
 
         return redirect()->route('order.magazijn')->with('success', 'Bestelling afgeleverd.');
     }
@@ -269,7 +270,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        if (in_array($order->status, ['geleverd', 'afgekeurd'])) {
+        if (in_array($order->status, [OrderStatus::Delivered->value, OrderStatus::Rejected->value])) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Urgentie kan niet meer gewijzigd worden.'], 422);
             }
