@@ -6,6 +6,60 @@
          class="fixed top-4 right-4 z-50 hidden max-w-sm text-sm font-medium px-4 py-3 rounded-xl shadow-lg">
     </div>
 
+    {{-- ══ MELDINGEN voor technieker ═══════════════════════════════ --}}
+    @if (Auth::user()->role === 'technieker')
+    @php $unread = auth()->user()->unreadNotifications; @endphp
+    @if ($unread->isNotEmpty())
+    <div id="melding-container" class="space-y-2 mb-6">
+        @foreach ($unread as $notif)
+        @php $d = $notif->data; @endphp
+        <div class="melding-item flex items-start gap-3 bg-white border-l-4 rounded-xl shadow-sm px-4 py-3
+                    {{ $d['status'] === 'goedgekeurd' ? 'border-green-500' : ($d['status'] === 'geleverd' ? 'border-blue-500' : 'border-red-400') }}"
+             data-id="{{ $notif->id }}">
+            <span class="text-xl shrink-0 mt-0.5">{{ $d['icon'] }}</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-800">{{ $d['message'] }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
+            </div>
+            <button onclick="sluitMelding(this)" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        @endforeach
+    </div>
+    <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    function sluitMelding(btn) {
+        const item = btn.closest('.melding-item');
+        item.style.transition = 'opacity .3s, transform .3s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        setTimeout(() => item.remove(), 300);
+
+        // Als alle meldingen gesloten → markeer als gelezen
+        const container = document.getElementById('melding-container');
+        if (!container.querySelector('.melding-item:not([style*="opacity: 0"])')) {
+            fetch('/notifications/read-all', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+            });
+        }
+    }
+
+    // Auto-markeer als gelezen na 8 seconden
+    setTimeout(() => {
+        fetch('/notifications/read-all', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken },
+        });
+    }, 8000);
+    </script>
+    @endif
+    @endif
+
     {{-- Header acties --}}
     <div class="flex justify-between items-center mb-6">
         <p class="text-sm text-gray-500">
@@ -97,7 +151,7 @@
                             {{-- Product + urgent badge --}}
                             <td class="px-6 py-4 font-medium text-gray-900">
                                 {{ $order->product->name }}
-                                <span class="urgent-badge {{ ($order->urgent ?? false) ? '' : 'hidden' }} ml-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">🚨 URGENT</span>
+                                <span class="urgent-badge {{ ($order->urgent ?? false) ? '' : 'hidden' }} ml-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">🚨 DRINGEND</span>
                             </td>
 
                             @if(Auth::user()->role !== 'technieker')
