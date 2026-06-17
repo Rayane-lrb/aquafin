@@ -23,6 +23,11 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites');
+    }
+
     protected static function boot(): void
     {
         parent::boot();
