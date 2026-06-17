@@ -24,7 +24,7 @@
 
         ['route' => 'neerslag.*',       'href' => route('neerslag.index'),       'label' => 'Neerslag',    'icon' => 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z'],
         ['route' => 'productcategory.*','href' => route('productcategory.index'),'label' => 'Categorieën', 'icon' => 'M7 7h.01M7 3h5l6 6v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z'],
-        ...($role !== 'magazijnBeheerder' ? [['route' => 'warehouse.*', 'href' => route('warehouse.index'), 'label' => 'Magazijnen', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4']] : []),
+        ...($role === 'admin' ? [['route' => 'warehouse.*', 'href' => route('warehouse.index'), 'label' => 'Magazijnen', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4']] : []),
     ];
 
     if ($role === 'admin') {
