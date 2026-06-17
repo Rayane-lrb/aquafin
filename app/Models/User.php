@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'default_warehouse_id',
     ];
 
     /**
