@@ -11,10 +11,10 @@ class SuggestionFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'title' => fake()->sentence(4),
-            'description' => fake()->paragraph(),
+            'title' => $this->faker->sentence(4),
+            'description' => $this->faker->paragraph(),
             'image' => null,
-            'status' => fake()->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd']),
+            'status' => $this->faker->randomElement(['in behandeling', 'goedgekeurd', 'afgekeurd']),
         ];
     }
 }
