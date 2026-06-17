@@ -65,9 +65,9 @@
                 <span class="font-semibold text-gray-700 text-sm">{{ $firstOrder->user->name ?? '—' }}</span>
                 <span class="text-xs text-gray-400">({{ $userOrders->count() }} bestelling{{ $userOrders->count() !== 1 ? 'en' : '' }})</span>
                 @if ($hasUrgent)
-                    <span class="group-urgent-badge ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 URGENT</span>
+                    <span class="group-urgent-badge ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 DRINGEND</span>
                 @else
-                    <span class="group-urgent-badge hidden ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 URGENT</span>
+                    <span class="group-urgent-badge hidden ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 DRINGEND</span>
                 @endif
             </div>
 
@@ -165,7 +165,7 @@
                                             <button type="submit"
                                                     class="urgent-toggle-btn text-xs font-medium px-3 py-1.5 rounded-lg transition border
                                                         {{ ($order->urgent ?? false) ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' : 'bg-white text-red-500 border-red-200 hover:bg-red-50' }}">
-                                                {{ ($order->urgent ?? false) ? '🚨 Opheffen' : '🚨 URGENT' }}
+                                                {{ ($order->urgent ?? false) ? '🚨 Opheffen' : '🚨 DRINGEND' }}
                                             </button>
                                         </form>
                                     @endif
@@ -337,7 +337,7 @@ function handleUrgentToggle(row, data) {
     // Knop tekst + stijl
     const btn = row.querySelector('.urgent-toggle-btn');
     if (btn) {
-        btn.textContent = isUrgent ? '🚨 Opheffen' : '🚨 URGENT';
+        btn.textContent = isUrgent ? '🚨 Opheffen' : '🚨 DRINGEND';
         btn.className = 'urgent-toggle-btn text-xs font-medium px-3 py-1.5 rounded-lg transition border '
             + (isUrgent
                 ? 'bg-red-600 text-white border-red-600 hover:bg-red-700'
