@@ -99,8 +99,9 @@ class CartController extends Controller
 
     public function ajaxUpdate(Request $request, Product $product)
     {
-        $cart = session('cart', []);
-        $qty = (int) $request->input('quantity', 0);
+        $cart     = session('cart', []);
+        $qty      = (int) $request->input('quantity', 0);
+        $wasEmpty = ! isset($cart[$product->id]) || $cart[$product->id] === 0;
 
         if ($qty <= 0) {
             unset($cart[$product->id]);
@@ -110,12 +111,31 @@ class CartController extends Controller
 
         session(['cart' => $cart]);
 
+        // Aanbevolen producten tonen bij elke toevoeging
+        $recommended = [];
+        if ($qty > 0 && $product->product_category_id) {
+            $recommended = Product::where('product_category_id', $product->product_category_id)
+                ->where('id', '!=', $product->id)
+                ->where('is_active', true)
+                ->whereNotIn('id', array_keys($cart))
+                ->inRandomOrder()
+                ->limit(3)
+                ->get(['id', 'name', 'image', 'stock'])
+                ->map(fn ($p) => [
+                    'id'    => $p->id,
+                    'name'  => $p->name,
+                    'image' => $p->image ? asset('storage/' . $p->image) : null,
+                    'stock' => $p->stock,
+                ]);
+        }
+
         return response()->json([
-            'success' => true,
-            'quantity' => max(0, $qty),
+            'success'      => true,
+            'quantity'     => max(0, $qty),
             'productCount' => count($cart),
-            'totalQuantity' => array_sum($cart),
-            'removed' => $qty <= 0,
+            'totalQuantity'=> array_sum($cart),
+            'removed'      => $qty <= 0,
+            'recommended'  => $recommended,
         ]);
     }
 }
