@@ -100,30 +100,19 @@ public function index(Request $request)
     {
         $request->validate([
             'name'                => ['required', 'string', 'max:255'],
-            'barcode'             => ['nullable', 'string', 'max:50', 'unique:products,barcode'],
             'stock'               => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
             'image'               => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data             = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
+        $data              = $request->only(['name', 'stock', 'product_category_id']);
         $data['is_active'] = true;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-
-        if (empty($data['barcode'])) {
-            $data['barcode'] = 'AQF-' . strtoupper(substr(uniqid(), -6)) . '-' . rand(100, 999);
-        }
-
-        $product = Product::create($data);
-
-
-        if (!$request->filled('barcode')) {
-            $product->update(['barcode' => 'AQF-' . str_pad($product->id, 6, '0', STR_PAD_LEFT)]);
-        }
+        Product::create($data); // barcode auto-généré par le Model
 
         return redirect()->route('product.index');
     }
@@ -134,13 +123,12 @@ public function index(Request $request)
 
         $request->validate([
             'name'                => ['required', 'string', 'max:255'],
-            'barcode'             => ['nullable', 'string', 'max:50', 'unique:products,barcode,' . $id],
             'stock'               => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
             'image'               => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
+        $data = $request->only(['name', 'stock', 'product_category_id']);
         $data['is_flood_tool']  = $request->boolean('is_flood_tool');
         $data['needed_on_rain'] = $request->boolean('needed_on_rain');  // ← cette ligne manque probablement
 
