@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\ProductCategory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -114,13 +116,50 @@ class PrecipitationController extends Controller
 
             $monthlyAvg = array_values($monthlyForecast);
 
+            // ── Neerslag-gebaseerde productsuggesties ─────────────────────
+            $currentPrecip  = (float) ($current['precipitation'] ?? 0);
+            $todayTotal     = (float) ($days[0]['precip_sum'] ?? 0);
+            $tomorrowTotal  = (float) ($days[1]['precip_sum'] ?? 0);
+            $maxPrecip      = max($currentPrecip, $todayTotal, $tomorrowTotal);
+
+            // Intensiteitsniveau bepalen
+            if ($maxPrecip >= 10) {
+                $rainLevel = 'zwaar';       // ≥10 mm
+            } elseif ($maxPrecip >= 3) {
+                $rainLevel = 'matig';       // 3–10 mm
+            } elseif ($maxPrecip > 0) {
+                $rainLevel = 'licht';       // 0–3 mm
+            } else {
+                $rainLevel = 'droog';
+            }
+
+            // Categorieën per niveau
+            $categoryPriority = match ($rainLevel) {
+                'zwaar'  => ['Leidingen & Koppelingen', 'Gereedschap & Machines', 'Inspectie & Meting', 'Verbruiksmaterialen'],
+                'matig'  => ['Leidingen & Koppelingen', 'Verbruiksmaterialen', 'Gereedschap & Machines'],
+                'licht'  => ['Verbruiksmaterialen', 'Leidingen & Koppelingen'],
+                default  => [],
+            };
+
+            $recommendedProducts = collect();
+            if (! empty($categoryPriority)) {
+                $catIds = ProductCategory::whereIn('name', $categoryPriority)->pluck('id');
+                $recommendedProducts = Product::whereIn('product_category_id', $catIds)
+                    ->where('is_active', true)
+                    ->where('stock', '>', 0)
+                    ->inRandomOrder()
+                    ->limit(6)
+                    ->get();
+            }
+
         } catch (\Exception $e) {
             return view('neerslag.index', ['error' => 'Fout: '.$e->getMessage()]);
         }
 
         return view('neerslag.index', compact(
             'current', 'hoursToday', 'days',
-            'weekTotal', 'weekAvg', 'rainyDays', 'monthlyAvg'
+            'weekTotal', 'weekAvg', 'rainyDays', 'monthlyAvg',
+            'rainLevel', 'recommendedProducts'
         ));
     }
 }
