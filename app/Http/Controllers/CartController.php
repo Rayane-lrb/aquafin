@@ -13,18 +13,25 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cart               = session('cart', []);
-        $products           = Product::findMany(array_keys($cart));
-        $warehouses         = Warehouse::orderBy('name')->get();
+        $cart = session('cart', []);
+        $products = Product::findMany(array_keys($cart));
+        $warehouses = Warehouse::orderBy('name')->get();
         $defaultWarehouseId = auth()->user()->default_warehouse_id;
 
-        return view('cart.index', compact('cart', 'products', 'warehouses', 'defaultWarehouseId'));
+        $orderHistory = Order::where('user_id', Auth::id())
+            ->whereNotNull('order_group_id')
+            ->with('product')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('order_group_id');
+
+        return view('cart.index', compact('cart', 'products', 'warehouses', 'defaultWarehouseId', 'orderHistory'));
     }
 
     public function add(Request $request, Product $product)
     {
         $cart = session('cart', []);
-        $qty  = max(1, (int) $request->input('quantity', 1));
+        $qty = max(1, (int) $request->input('quantity', 1));
 
         $cart[$product->id] = ($cart[$product->id] ?? 0) + $qty;
         session(['cart' => $cart]);
@@ -35,7 +42,7 @@ class CartController extends Controller
     public function update(Request $request, Product $product)
     {
         $cart = session('cart', []);
-        $qty  = (int) $request->input('quantity', 1);
+        $qty = (int) $request->input('quantity', 1);
 
         if ($qty <= 0) {
             unset($cart[$product->id]);
@@ -70,17 +77,17 @@ class CartController extends Controller
         }
 
         $groupId = (string) Str::uuid();
-        $urgent  = $request->boolean('urgent');
+        $urgent = $request->boolean('urgent');
 
         foreach ($cart as $productId => $quantity) {
             Order::create([
                 'order_group_id' => $groupId,
-                'user_id'        => Auth::id(),
-                'product_id'     => $productId,
-                'quantity'       => $quantity,
-                'status'         => 'in behandeling',
-                'warehouse_id'   => $request->warehouse_id,
-                'urgent'         => $urgent,
+                'user_id' => Auth::id(),
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'status' => 'in behandeling',
+                'warehouse_id' => $request->warehouse_id,
+                'urgent' => $urgent,
             ]);
         }
 
@@ -88,10 +95,11 @@ class CartController extends Controller
 
         return redirect()->route('order.index')->with('success', 'Bestelling geplaatst!');
     }
+
     public function ajaxUpdate(Request $request, Product $product)
     {
         $cart = session('cart', []);
-        $qty  = (int) $request->input('quantity', 0);
+        $qty = (int) $request->input('quantity', 0);
 
         if ($qty <= 0) {
             unset($cart[$product->id]);
@@ -102,11 +110,11 @@ class CartController extends Controller
         session(['cart' => $cart]);
 
         return response()->json([
-            'success'        => true,
-            'quantity'       => max(0, $qty),
-            'productCount'   => count($cart),
-            'totalQuantity'  => array_sum($cart),
-            'removed'        => $qty <= 0,
+            'success' => true,
+            'quantity' => max(0, $qty),
+            'productCount' => count($cart),
+            'totalQuantity' => array_sum($cart),
+            'removed' => $qty <= 0,
         ]);
     }
 }

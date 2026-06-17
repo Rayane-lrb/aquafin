@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::orderByRaw("FIELD(role, 'admin', 'magazijnBeheerder', 'technieker')")->get();
 
         return view('admin.users.index', ['users' => $users]);
     }
@@ -65,8 +65,9 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index');
     }
-    
-    public function destroy(string $id) {
+
+    public function destroy(string $id)
+    {
         $user = User::findOrFail($id);
 
         $user->delete();
