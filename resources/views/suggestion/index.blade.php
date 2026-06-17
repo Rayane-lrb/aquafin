@@ -1,57 +1,46 @@
 <x-app-layout>
     <x-slot name="header">Suggesties</x-slot>
 
-    <div class="flex justify-between items-center mb-6">
-        <p class="text-sm text-gray-500">Overzicht van alle suggesties</p>
-        <a href="{{ route('suggestion.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-            + Nieuwe suggestie
-        </a>
+    <div class="mb-4">
+        <form method="GET" class="flex gap-2">
+            <select name="status" onchange="this.form.submit()"
+                    class="rounded-xl border-gray-200 text-sm">
+                <option value="">Alle statussen</option>
+                <option value="in behandeling" {{ request('status') === 'in behandeling' ? 'selected' : '' }}>In behandeling</option>
+                <option value="goedgekeurd" {{ request('status') === 'goedgekeurd' ? 'selected' : '' }}>Goedgekeurd</option>
+                <option value="afgekeurd" {{ request('status') === 'afgekeurd' ? 'selected' : '' }}>Afgekeurd</option>
+            </select>
+        </form>
     </div>
 
-    <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
-        <table class="w-full text-sm text-left">
-            <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
-                <tr>
-                    <th class="px-6 py-3">Titel</th>
-                    <th class="px-6 py-3">Ingediend door</th>
-                    <th class="px-6 py-3">Status</th>
-                    <th class="px-6 py-3">Acties</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($suggestions as $suggestion)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-medium text-gray-900">{{ $suggestion->title }}</td>
-                    <td class="px-6 py-4 text-gray-500">{{ $suggestion->user->name }}</td>
-                    <td class="px-6 py-4">
-                        @if ($suggestion->status === 'goedgekeurd')
-                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Goedgekeurd</span>
-                        @elseif ($suggestion->status === 'afgekeurd')
-                            <span class="bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded-full">Afgekeurd</span>
-                        @else
-                            <span class="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded-full">In behandeling</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 flex gap-3">
-                        <a href="{{ route('suggestion.show', $suggestion->id) }}" class="text-blue-600 hover:underline">Bekijken</a>
-                        @if (Auth::user()?->role === 'admin' && $suggestion->status === 'in behandeling')
-                            <form action="{{ route('suggestion.approve', $suggestion->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="text-green-600 hover:underline">Goedkeuren</button>
-                            </form>
-                            <form action="{{ route('suggestion.reject', $suggestion->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="text-red-500 hover:underline">Afkeuren</button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-gray-400">Geen suggesties gevonden.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="space-y-3">
+        @forelse ($suggestions as $suggestion)
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-semibold text-gray-800">{{ $suggestion->title }}</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ $suggestion->description }}</p>
+                        <p class="text-xs text-gray-400 mt-2">
+                            Door {{ $suggestion->user?->name ?? 'Onbekend' }} ·
+                            {{ $suggestion->created_at->isoFormat('D MMM YYYY') }}
+                        </p>
+                    </div>
+                    <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full
+                        {{ $suggestion->status === 'in behandeling' ? 'bg-yellow-50 text-yellow-700' : '' }}
+                        {{ $suggestion->status === 'goedgekeurd' ? 'bg-green-50 text-green-700' : '' }}
+                        {{ $suggestion->status === 'afgekeurd' ? 'bg-gray-100 text-gray-500' : '' }}">
+                        {{ $suggestion->status }}
+                    </span>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+                <p class="text-gray-400">Geen suggesties gevonden.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <div class="mt-6">
+        {{ $suggestions->links() }}
     </div>
 </x-app-layout>

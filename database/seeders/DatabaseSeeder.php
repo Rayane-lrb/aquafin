@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\Suggestion;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,32 +16,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            ['name' => 'Test User', 'role' => 'admin', 'password' => bcrypt('password')],
+        );
 
-        User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role' => 'admin',
-            'password' => bcrypt('password'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'tech@user.com'],
+            ['name' => 'tech user', 'role' => 'technieker', 'password' => bcrypt('password')],
+        );
 
-        User::create([
-            'name' => 'tech user',
-            'email' => 'tech@user.com',
-            'role' => 'technieker',
-            'password' => bcrypt('password'),
-        ]);
-
-        User::create([
-            'name' => 'magazijn user',
-            'email' => 'mag@user.com',
-            'role' => 'magazijnBeheerder',
-            'password' => bcrypt('password'),
-        ]);
-
-        // ProductCategory::factory(5)->create();
-        // Product::factory(10)->create();
-        // Suggestion::factory(10)->create();
+        User::firstOrCreate(
+            ['email' => 'mag@user.com'],
+            ['name' => 'magazijn user', 'role' => 'magazijnBeheerder', 'password' => bcrypt('password')],
+        );
+        Suggestion::factory(10)->create();
 
     }
 }

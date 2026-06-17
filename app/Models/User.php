@@ -48,11 +48,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function suggestions()
-    {
-        return $this->hasMany(Suggestion::class);
-    }
-
     public function orders()
     {
         return $this->hasMany(Order::class);

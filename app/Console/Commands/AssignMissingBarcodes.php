@@ -7,7 +7,8 @@ use Illuminate\Console\Command;
 
 class AssignMissingBarcodes extends Command
 {
-    protected $signature   = 'products:assign-barcodes';
+    protected $signature = 'products:assign-barcodes';
+
     protected $description = 'Assigne un barcode à 5 chiffres aux produits qui n\'en ont pas';
 
     public function handle(): void
@@ -16,6 +17,7 @@ class AssignMissingBarcodes extends Command
 
         if ($products->isEmpty()) {
             $this->info('Tous les produits ont déjà un barcode.');
+
             return;
         }
 

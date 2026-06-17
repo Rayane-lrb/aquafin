@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PrecipitationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\WarehouseController;
 use App\Models\Product;
@@ -78,6 +79,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/warehouse/{id}', [WarehouseController::class, 'update'])->name('warehouse.update');
     Route::delete('/warehouse/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.destroy');
 
+    // Suggestions
+    Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
+
     // Orders
     Route::get('/order', [OrderController::class, 'index'])->name('order.index');
     Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
@@ -88,16 +92,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/order/{id}/reject', [OrderController::class, 'reject'])->name('order.reject');
     Route::patch('/order/{id}/deliver', [OrderController::class, 'deliver'])->name('order.deliver');
     Route::patch('/order/{id}/urgent', [OrderController::class, 'toggleUrgent'])->name('order.urgent');
-
-    // Suggestions
-    Route::get('/suggestion', [SuggestionController::class, 'index'])->name('suggestion.index');
-    Route::get('/suggestion/create', [SuggestionController::class, 'create'])->name('suggestion.create');
-    Route::get('/suggestion/{id}', [SuggestionController::class, 'show'])->name('suggestion.show');
-    Route::post('/suggestion', [SuggestionController::class, 'store'])->name('suggestion.store');
-    Route::patch('/suggestion/{id}/approve', [SuggestionController::class, 'approve'])->name('suggestion.approve');
-    Route::patch('/suggestion/{id}/reject', [SuggestionController::class, 'reject'])->name('suggestion.reject');
-    Route::post('/suggestion/{id}/add-to-catalog', [SuggestionController::class, 'addToCatalog'])->name('suggestion.addToCatalog');
-    Route::delete('/suggestion/{id}', [SuggestionController::class, 'destroy'])->name('suggestion.destroy');
 });
 
 // Admin - User management

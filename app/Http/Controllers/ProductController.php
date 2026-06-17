@@ -25,15 +25,15 @@ class ProductController extends Controller
 
         $categories = ProductCategory::all();
 
-       $cartQty = session('cart', []);
+        $cartQty = session('cart', []);
 
-return view('product.index', [
-    'products' => $products,
-    'query' => $query,
-    'categories' => $categories,
-    'selectedCategory' => $selectedCategory,
-    'cartQty' => $cartQty,
-]);
+        return view('product.index', [
+            'products' => $products,
+            'query' => $query,
+            'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
+            'cartQty' => $cartQty,
+        ]);
     }
 
     public function show($id)
@@ -62,14 +62,14 @@ return view('product.index', [
     public function store(Request $request)
     {
         $request->validate([
-            'name'                => ['required', 'string', 'max:255'],
-            'barcode'             => ['nullable', 'string', 'max:50', 'unique:products,barcode'],
-            'stock'               => ['required', 'integer', 'min:0'],
+            'name' => ['required', 'string', 'max:255'],
+            'barcode' => ['nullable', 'string', 'max:50', 'unique:products,barcode'],
+            'stock' => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
-            'image'               => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data             = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
+        $data = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
         $data['is_active'] = true;
 
         if ($request->hasFile('image')) {
@@ -78,14 +78,14 @@ return view('product.index', [
 
         // Auto-genereer barcode als leeg gelaten
         if (empty($data['barcode'])) {
-            $data['barcode'] = 'AQF-' . strtoupper(substr(uniqid(), -6)) . '-' . rand(100, 999);
+            $data['barcode'] = 'AQF-'.strtoupper(substr(uniqid(), -6)).'-'.rand(100, 999);
         }
 
         $product = Product::create($data);
 
         // Overschrijf met barcode op basis van ID (stabiel en uniek)
-        if (!$request->filled('barcode')) {
-            $product->update(['barcode' => 'AQF-' . str_pad($product->id, 6, '0', STR_PAD_LEFT)]);
+        if (! $request->filled('barcode')) {
+            $product->update(['barcode' => 'AQF-'.str_pad($product->id, 6, '0', STR_PAD_LEFT)]);
         }
 
         return redirect()->route('product.index');
@@ -96,11 +96,11 @@ return view('product.index', [
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'name'                => ['required', 'string', 'max:255'],
-            'barcode'             => ['nullable', 'string', 'max:50', 'unique:products,barcode,' . $id],
-            'stock'               => ['required', 'integer', 'min:0'],
+            'name' => ['required', 'string', 'max:255'],
+            'barcode' => ['nullable', 'string', 'max:50', 'unique:products,barcode,'.$id],
+            'stock' => ['required', 'integer', 'min:0'],
             'product_category_id' => ['required', 'exists:product_categories,id'],
-            'image'               => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $data = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
@@ -117,7 +117,7 @@ return view('product.index', [
     public function toggle(string $id)
     {
         $product = Product::findOrFail($id);
-        $product->update(['is_active' => !$product->is_active]);
+        $product->update(['is_active' => ! $product->is_active]);
 
         return redirect()->route('product.index');
     }
