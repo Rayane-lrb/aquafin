@@ -3,22 +3,22 @@
 
     {{-- Toolbar --}}
     <form method="GET" action="{{ route('product.index') }}" class="mb-6 space-y-3">
-        <div class="flex flex-wrap gap-3 items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-center sm:justify-between">
             <div class="flex gap-2 flex-1 min-w-0">
                 <input type="text" name="search" value="{{ $query }}"
                     placeholder="Zoek een product..."
                     class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
                     Zoeken
                 </button>
                 @if ($query || $selectedCategory)
-                    <a href="{{ route('product.index') }}" class="text-sm text-gray-400 hover:text-gray-600 px-3 py-2 rounded-lg border border-gray-200 transition">
+                    <a href="{{ route('product.index') }}" class="text-sm text-gray-400 hover:text-gray-600 px-3 py-2 rounded-lg border border-gray-200 transition whitespace-nowrap">
                         ✕ Reset
                     </a>
                 @endif
             </div>
             @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
-                <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
+                <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap text-center w-full sm:w-auto">
                     + Product toevoegen
                 </a>
             @endif
