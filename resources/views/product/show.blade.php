@@ -16,6 +16,10 @@
                 <p class="text-gray-800">{{ $product->stock }}</p>
             </div>
             <div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider">Barcode</span>
+                <p class="text-gray-800 font-mono font-semibold tracking-widest">{{ $product->barcode ?? '—' }}</p>
+            </div>
+            <div>
                 <span class="text-xs text-gray-400 uppercase tracking-wider">Status</span>
                 <p>
                     @if ($product->is_active)

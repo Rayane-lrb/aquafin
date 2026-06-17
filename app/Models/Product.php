@@ -22,4 +22,19 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class);
     }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Product $product) {
+            if (empty($product->barcode)) {
+                do {
+                    $code = random_int(10000, 99999);
+                } while (static::where('barcode', $code)->exists());
+
+                $product->barcode = $code;
+            }
+        });
+    }
 }
