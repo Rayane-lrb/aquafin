@@ -150,7 +150,7 @@
 
                             {{-- Product + urgent badge --}}
                             <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $order->product->name }}
+                                {{ $order->product?->name ?? '—' }}
                                 <span class="urgent-badge {{ ($order->urgent ?? false) ? '' : 'hidden' }} ml-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">🚨 DRINGEND</span>
                             </td>
 

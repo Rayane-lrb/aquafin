@@ -43,8 +43,8 @@ class OrderController extends Controller
 
         return view('order.index', [
             'grouped' => $grouped,
-            'orders' => $orders,
-            'query' => $query,
+            'orders'  => $orders,
+            'query'   => $query,
         ]);
     }
 
@@ -61,16 +61,16 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => ['required', 'exists:products,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'product_id'   => ['required', 'exists:products,id'],
+            'quantity'     => ['required', 'integer', 'min:1'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
         ]);
 
         Order::create([
-            'user_id' => Auth::id(),
-            'product_id' => $request->product_id,
-            'quantity' => $request->quantity,
-            'status' => OrderStatus::Pending->value,
+            'user_id'      => Auth::id(),
+            'product_id'   => $request->product_id,
+            'quantity'     => $request->quantity,
+            'status'       => OrderStatus::Pending->value,
             'warehouse_id' => $request->warehouse_id,
         ]);
 
@@ -100,12 +100,12 @@ class OrderController extends Controller
 
         $request->validate([
             'product_id' => ['required', 'exists:products,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'quantity'   => ['required', 'integer', 'min:1'],
         ]);
 
         $order->update([
             'product_id' => $request->product_id,
-            'quantity' => $request->quantity,
+            'quantity'   => $request->quantity,
         ]);
 
         return redirect()->route('order.index');
@@ -113,7 +113,7 @@ class OrderController extends Controller
 
     public function approve(Request $request, string $id)
     {
-        $order = Order::findOrFail($id);
+        $order   = Order::findOrFail($id);
         $product = $order->product;
 
         if ($product->stock < $order->quantity) {
@@ -183,11 +183,7 @@ class OrderController extends Controller
     public function magazijn(Request $request)
     {
         $role = auth()->user()?->role;
-<<<<<<< HEAD
         if (! in_array($role, ['magazijnBeheerder', 'admin'])) {
-=======
-        if (!in_array($role, ['magazijnBeheerder', 'admin'])) {
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             abort(403);
         }
 
@@ -197,15 +193,14 @@ class OrderController extends Controller
             ->with(['user', 'product', 'warehouse'])
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
-<<<<<<< HEAD
-                    $sub->whereHas('user', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
-                        ->orWhereHas('product', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
+                    $sub->whereHas('user',      fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
+                        ->orWhereHas('product',   fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
                         ->orWhereHas('warehouse', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"));
                 });
             });
 
         $groupFn = fn ($orders) => $orders
-            ->groupBy(fn ($o) => $o->order_group_id ?? 'solo-'.$o->id)
+            ->groupBy(fn ($o) => $o->order_group_id ?? 'solo-' . $o->id)
             ->sortByDesc(fn ($g) => $g->max('urgent') ? 1 : 0);
 
         $pending  = (clone $base)->where('status', OrderStatus::Pending->value)->orderByDesc('urgent')->get();
@@ -213,31 +208,10 @@ class OrderController extends Controller
         $archive  = (clone $base)->whereIn('status', [OrderStatus::Delivered->value, OrderStatus::Rejected->value])->latest()->get();
 
         return view('order.magazijn', [
-            'pendingGroups' => $groupFn($pending),
-            'approvedGroups' => $groupFn($approved),
-            'archiveGroups' => $groupFn($archive),
-            'query' => $q,
-=======
-                    $sub->whereHas('user',        fn($s) => $s->where('name', 'LIKE', "%{$q}%"))
-                        ->orWhereHas('product',   fn($s) => $s->where('name', 'LIKE', "%{$q}%"))
-                        ->orWhereHas('warehouse', fn($s) => $s->where('name', 'LIKE', "%{$q}%"));
-                });
-            });
-
-        $groupFn = fn($orders) => $orders
-            ->groupBy(fn($o) => $o->order_group_id ?? 'solo-' . $o->id)
-            ->sortByDesc(fn($g) => $g->max('urgent') ? 1 : 0);
-
-        $pending  = (clone $base)->where('status', 'in behandeling')->orderByDesc('urgent')->get();
-        $approved = (clone $base)->where('status', 'goedgekeurd')->orderByDesc('urgent')->get();
-        $archive  = (clone $base)->whereIn('status', ['geleverd', 'afgekeurd'])->latest()->get();
-
-        return view('order.magazijn', [
             'pendingGroups'  => $groupFn($pending),
             'approvedGroups' => $groupFn($approved),
             'archiveGroups'  => $groupFn($archive),
             'query'          => $q,
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
         ]);
     }
 
@@ -248,23 +222,15 @@ class OrderController extends Controller
     public function groupApprove(Request $request, string $groupId)
     {
         $orders = Order::where('order_group_id', $groupId)
-<<<<<<< HEAD
             ->where('status', OrderStatus::Pending->value)
-=======
-            ->where('status', 'in behandeling')
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             ->with('product')
             ->get();
 
         foreach ($orders as $order) {
             if ($order->product->stock >= $order->quantity) {
                 $order->product->decrement('stock', $order->quantity);
-<<<<<<< HEAD
                 $order->update(['status' => OrderStatus::Approved->value]);
                 $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
-=======
-                $order->update(['status' => 'goedgekeurd']);
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             }
         }
 
@@ -274,13 +240,8 @@ class OrderController extends Controller
     public function groupReject(Request $request, string $groupId)
     {
         Order::where('order_group_id', $groupId)
-<<<<<<< HEAD
             ->where('status', OrderStatus::Pending->value)
             ->update(['status' => OrderStatus::Rejected->value]);
-=======
-            ->where('status', 'in behandeling')
-            ->update(['status' => 'afgekeurd']);
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
 
         return redirect()->route('order.magazijn')->with('success', 'Alle bestellingen geweigerd.');
     }
@@ -297,7 +258,6 @@ class OrderController extends Controller
 
     public function groupDeliver(Request $request, string $groupId)
     {
-<<<<<<< HEAD
         $toDeliver = Order::where('order_group_id', $groupId)
             ->where('status', OrderStatus::Approved->value)
             ->with(['user', 'product'])
@@ -307,11 +267,6 @@ class OrderController extends Controller
             $order->update(['status' => OrderStatus::Delivered->value]);
             $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
         }
-=======
-        Order::where('order_group_id', $groupId)
-            ->where('status', 'goedgekeurd')
-            ->update(['status' => 'geleverd']);
->>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
 
         return redirect()->route('order.magazijn')->with('success', 'Bestelling afgeleverd.');
     }
@@ -339,10 +294,10 @@ class OrderController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => true,
-                'urgent' => (bool) $order->urgent,
+                'success'  => true,
+                'urgent'   => (bool) $order->urgent,
                 'order_id' => $order->id,
-                'message' => $order->urgent ? '🚨 Bestelling gemarkeerd als URGENT.' : 'Urgentie opgeheven.',
+                'message'  => $order->urgent ? '🚨 Bestelling gemarkeerd als URGENT.' : 'Urgentie opgeheven.',
             ]);
         }
 
