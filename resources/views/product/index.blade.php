@@ -98,10 +98,6 @@
     {{-- ══ SUGGESTIES ══════════════════════════════════════════════ --}}
     @if($showCategories && $suggestedProducts->isNotEmpty())
     <div class="mb-6">
-        <div class="text-center mb-4">
-            <h2 class="text-base font-bold text-gray-900 tracking-tight">{{ $suggestLabel }}</h2>
-            <p class="text-xs text-gray-400 mt-0.5">{{ $suggestSub }}</p>
-        </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             @foreach($suggestedProducts as $sp)
             <a href="{{ route('product.show', $sp->id) }}"
