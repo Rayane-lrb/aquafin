@@ -1,6 +1,26 @@
 <x-app-layout>
     <x-slot name="header">Neerslag</x-slot>
 
+    {{-- Locatiekiezer --}}
+    @if (isset($warehouses) && $warehouses->count() > 1)
+    <form method="GET" action="{{ route('neerslag.index') }}" class="mb-5">
+        <div class="flex items-center gap-3">
+            <label class="text-sm font-medium text-gray-600 whitespace-nowrap">📍 Locatie:</label>
+            <select name="warehouse_id" onchange="this.form.submit()"
+                class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                @foreach ($warehouses as $wh)
+                    <option value="{{ $wh->id }}" {{ isset($warehouse) && $warehouse->id === $wh->id ? 'selected' : '' }}>
+                        {{ $wh->name }}
+                    </option>
+                @endforeach
+            </select>
+            @if (isset($warehouse))
+                <span class="text-xs text-gray-400">{{ $warehouse->latitude }}, {{ $warehouse->longitude }}</span>
+            @endif
+        </div>
+    </form>
+    @endif
+
     @if (isset($error))
         <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
             {{ $error }}

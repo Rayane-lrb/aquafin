@@ -4,15 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Warehouse;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class PrecipitationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user      = auth()->user();
-        $warehouse = $user?->defaultWarehouse ?? \App\Models\Warehouse::first();
+        $user       = auth()->user();
+        $warehouses = Warehouse::whereNotNull('latitude')->whereNotNull('longitude')->get();
+
+        // Warehouse choisi : paramètre GET → session → warehouse par défaut → premier avec coords
+        if ($request->has('warehouse_id')) {
+            session(['neerslag_warehouse_id' => $request->warehouse_id]);
+        }
+        $selectedId = session('neerslag_warehouse_id', $user?->default_warehouse_id);
+        $warehouse  = $warehouses->firstWhere('id', $selectedId)
+            ?? $user?->defaultWarehouse
+            ?? $warehouses->first();
+
         $lat = $warehouse?->latitude  ?? 51.2194;
         $lon = $warehouse?->longitude ?? 4.4025;
 
@@ -161,7 +173,8 @@ class PrecipitationController extends Controller
         return view('neerslag.index', compact(
             'current', 'hoursToday', 'days',
             'weekTotal', 'weekAvg', 'rainyDays', 'monthlyAvg',
-            'rainLevel', 'recommendedProducts'
+            'rainLevel', 'recommendedProducts',
+            'warehouses', 'warehouse'
         ));
     }
 }
