@@ -180,7 +180,8 @@
             @endif
         </div>
 
-        {{-- Categorie pills (altijd zichtbaar) --}}
+        {{-- Categorie pills — alleen bij zoeken of filteren --}}
+        @if (!$showCategories)
         <div class="flex gap-2 overflow-x-auto pb-1 snap-x" style="scrollbar-width: none;">
             <a href="{{ route('product.index', array_filter(['search' => $query])) }}"
                class="snap-start shrink-0 px-3 py-1.5 rounded-full border text-xs font-medium transition whitespace-nowrap
@@ -196,6 +197,7 @@
             </a>
             @endforeach
         </div>
+        @endif
     </form>
 
     @if ($showCategories && ! $query)
