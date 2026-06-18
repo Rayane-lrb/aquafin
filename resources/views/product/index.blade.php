@@ -206,9 +206,11 @@
                             class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs sm:text-sm">
                             −
                         </button>
-                        <span id="qty-{{ $product->id }}" class="w-6 sm:w-8 text-center text-sm font-semibold text-gray-800">
-                            {{ $cartQty[$product->id] ?? 0 }}
-                        </span>
+                        <input type="number" id="qty-{{ $product->id }}"
+                            value="{{ $cartQty[$product->id] ?? 0 }}"
+                            min="0"
+                            onchange="setCart({{ $product->id }}, this.value)"
+                            class="w-12 text-center text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                         <button type="button" onclick="updateCart({{ $product->id }}, 1)"
                             class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs sm:text-sm">
                             +
@@ -242,15 +244,11 @@
                             {{ $product->is_active ? 'Verbergen' : 'Tonen' }}
                         </button>
                     </form>
-                    <form action="{{ route('product.destroy', $product->id) }}" method="POST"
-                        onsubmit="return confirm('Dit product verwijderen?')" class="flex-1">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="w-full text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 py-1 sm:py-1.5 rounded-lg transition">
-                            Verwijderen
-                        </button>
-                    </form>
+                    <button type="button"
+                        onclick="deleteProduct({{ $product->id }}, this)"
+                        class="flex-1 text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 py-1 sm:py-1.5 rounded-lg transition">
+                        Verwijderen
+                    </button>
                 </div>
                 @endif
             </div>
@@ -283,6 +281,24 @@
 </div>
 
 <script>
+// ── Product verwijderen (AJAX) ────────────────────────────────────
+function deleteProduct(id, btn) {
+    if (!confirm('Dit product verwijderen?')) return;
+    fetch('/product/' + id, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: '_method=DELETE'
+    })
+    .then(res => {
+        if (res.ok || res.redirected) {
+            btn.closest('.bg-white').remove();
+        }
+    });
+}
+
 // ── Toast notification ────────────────────────────────────────────
 function showToast(message) {
     let toast = document.getElementById('cart-toast');
@@ -370,7 +386,7 @@ function showRecommended(products) {
 // ── +/- knoppen ──────────────────────────────────────────────────
 function updateCart(productId, change) {
     const qtyEl = document.getElementById('qty-' + productId);
-    const currentQty = parseInt(qtyEl.textContent) || 0;
+    const currentQty = parseInt(qtyEl.value) || 0;
     const newQty = Math.max(0, currentQty + change);
 
     fetch('/cart/ajax/' + productId, {
@@ -380,14 +396,25 @@ function updateCart(productId, change) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) qtyEl.textContent = newQty;
+        if (data.success) qtyEl.value = newQty;
+    });
+}
+
+// ── Directe invoer in het veld ────────────────────────────────────
+function setCart(productId, value) {
+    const newQty = Math.max(0, parseInt(value) || 0);
+    document.getElementById('qty-' + productId).value = newQty;
+    fetch('/cart/ajax/' + productId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+        body: JSON.stringify({ quantity: newQty })
     });
 }
 
 // ── Mandje knop: toon aanbevelingen dan ga naar mandje ────────────
 function goToCart(productId) {
     const qtyEl = document.getElementById('qty-' + productId);
-    const currentQty = parseInt(qtyEl?.textContent) || 0;
+    const currentQty = parseInt(qtyEl?.value) || 0;
 
     fetch('/cart/ajax/' + productId, {
         method: 'POST',
