@@ -202,7 +202,18 @@
         </div>
     </form>
 
-    @if ($products->isEmpty())
+    @if ($showCategories && ! $query)
+    {{-- Categorie-kaarten zonder foto --}}
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+        @foreach ($categories as $cat)
+        <a href="{{ route('product.index', ['category' => $cat->id]) }}"
+           class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition p-4 flex flex-col gap-1">
+            <h3 class="font-semibold text-gray-800 text-sm truncate">{{ $cat->name }}</h3>
+            <p class="text-xs text-gray-400">{{ $cat->product_count }} product{{ $cat->product_count !== 1 ? 'en' : '' }}</p>
+        </a>
+        @endforeach
+    </div>
+    @elseif ($products->isEmpty())
         <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
             Geen producten gevonden.
         </div>
