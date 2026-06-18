@@ -8,6 +8,35 @@
         <div class="mb-4 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">{{ session('error') }}</div>
     @endif
 
+    {{-- Zoekbalk --}}
+    <form method="GET" action="{{ route('order.magazijn') }}" class="mb-6">
+        <div class="flex gap-2">
+            <div class="relative flex-1 max-w-sm">
+                <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                </div>
+                <input type="text" name="q" value="{{ $query ?? '' }}"
+                    placeholder="Zoek op persoon, product of magazijn…"
+                    class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+            </div>
+            <button type="submit"
+                class="text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                Zoeken
+            </button>
+            @if($query)
+            <a href="{{ route('order.magazijn') }}"
+                class="text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg transition">
+                ✕ Wissen
+            </a>
+            @endif
+        </div>
+        @if($query)
+        <p class="mt-2 text-xs text-gray-400">Resultaten voor "<span class="font-medium text-gray-600">{{ $query }}</span>"</p>
+        @endif
+    </form>
+
     {{-- Tellers --}}
     @php
         $urgentCount   = $pendingGroups->filter(fn($g) => $g->first()->urgent)->count()

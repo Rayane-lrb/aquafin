@@ -127,7 +127,12 @@
                     @csrf
 
                     <div>
-                        <label class="block text-xs text-gray-500 mb-1.5 font-medium">Leveringsmagazijn</label>
+                        <label class="block text-xs text-gray-500 mb-1.5 font-medium">
+                            Leveringsmagazijn
+                            @if ($defaultWarehouseId)
+                                <span class="ml-1 text-blue-500">⭐ standaard ingevuld</span>
+                            @endif
+                        </label>
                         @if ($warehouses->isEmpty())
                             <p class="text-xs text-red-500">Geen magazijnen beschikbaar. Vraag een beheerder er een toe te voegen.</p>
                         @else
@@ -135,7 +140,10 @@
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
                                 <option value="">Kies een magazijn...</option>
                                 @foreach ($warehouses as $w)
-                                    <option value="{{ $w->id }}">{{ $w->name }}{{ $w->address ? ' — ' . $w->address : '' }}</option>
+                                    <option value="{{ $w->id }}"
+                                        {{ old('warehouse_id', $defaultWarehouseId) == $w->id ? 'selected' : '' }}>
+                                        {{ $w->name }}{{ $w->address ? ' — ' . $w->address : '' }}
+                                    </option>
                                 @endforeach
                             </select>
                             @error('warehouse_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

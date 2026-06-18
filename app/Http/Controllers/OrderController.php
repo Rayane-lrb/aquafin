@@ -183,7 +183,11 @@ class OrderController extends Controller
     public function magazijn(Request $request)
     {
         $role = auth()->user()?->role;
+<<<<<<< HEAD
         if (! in_array($role, ['magazijnBeheerder', 'admin'])) {
+=======
+        if (!in_array($role, ['magazijnBeheerder', 'admin'])) {
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             abort(403);
         }
 
@@ -193,6 +197,7 @@ class OrderController extends Controller
             ->with(['user', 'product', 'warehouse'])
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
+<<<<<<< HEAD
                     $sub->whereHas('user', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
                         ->orWhereHas('product', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"))
                         ->orWhereHas('warehouse', fn ($s) => $s->where('name', 'LIKE', "%{$q}%"));
@@ -212,6 +217,27 @@ class OrderController extends Controller
             'approvedGroups' => $groupFn($approved),
             'archiveGroups' => $groupFn($archive),
             'query' => $q,
+=======
+                    $sub->whereHas('user',        fn($s) => $s->where('name', 'LIKE', "%{$q}%"))
+                        ->orWhereHas('product',   fn($s) => $s->where('name', 'LIKE', "%{$q}%"))
+                        ->orWhereHas('warehouse', fn($s) => $s->where('name', 'LIKE', "%{$q}%"));
+                });
+            });
+
+        $groupFn = fn($orders) => $orders
+            ->groupBy(fn($o) => $o->order_group_id ?? 'solo-' . $o->id)
+            ->sortByDesc(fn($g) => $g->max('urgent') ? 1 : 0);
+
+        $pending  = (clone $base)->where('status', 'in behandeling')->orderByDesc('urgent')->get();
+        $approved = (clone $base)->where('status', 'goedgekeurd')->orderByDesc('urgent')->get();
+        $archive  = (clone $base)->whereIn('status', ['geleverd', 'afgekeurd'])->latest()->get();
+
+        return view('order.magazijn', [
+            'pendingGroups'  => $groupFn($pending),
+            'approvedGroups' => $groupFn($approved),
+            'archiveGroups'  => $groupFn($archive),
+            'query'          => $q,
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
         ]);
     }
 
@@ -222,15 +248,23 @@ class OrderController extends Controller
     public function groupApprove(Request $request, string $groupId)
     {
         $orders = Order::where('order_group_id', $groupId)
+<<<<<<< HEAD
             ->where('status', OrderStatus::Pending->value)
+=======
+            ->where('status', 'in behandeling')
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             ->with('product')
             ->get();
 
         foreach ($orders as $order) {
             if ($order->product->stock >= $order->quantity) {
                 $order->product->decrement('stock', $order->quantity);
+<<<<<<< HEAD
                 $order->update(['status' => OrderStatus::Approved->value]);
                 $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
+=======
+                $order->update(['status' => 'goedgekeurd']);
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
             }
         }
 
@@ -240,8 +274,13 @@ class OrderController extends Controller
     public function groupReject(Request $request, string $groupId)
     {
         Order::where('order_group_id', $groupId)
+<<<<<<< HEAD
             ->where('status', OrderStatus::Pending->value)
             ->update(['status' => OrderStatus::Rejected->value]);
+=======
+            ->where('status', 'in behandeling')
+            ->update(['status' => 'afgekeurd']);
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
 
         return redirect()->route('order.magazijn')->with('success', 'Alle bestellingen geweigerd.');
     }
@@ -258,6 +297,7 @@ class OrderController extends Controller
 
     public function groupDeliver(Request $request, string $groupId)
     {
+<<<<<<< HEAD
         $toDeliver = Order::where('order_group_id', $groupId)
             ->where('status', OrderStatus::Approved->value)
             ->with(['user', 'product'])
@@ -267,6 +307,11 @@ class OrderController extends Controller
             $order->update(['status' => OrderStatus::Delivered->value]);
             $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
         }
+=======
+        Order::where('order_group_id', $groupId)
+            ->where('status', 'goedgekeurd')
+            ->update(['status' => 'geleverd']);
+>>>>>>> f81302a (FEAT: standaard magazijn vooringevuld bij bestellingen)
 
         return redirect()->route('order.magazijn')->with('success', 'Bestelling afgeleverd.');
     }
