@@ -322,17 +322,13 @@
                         class="flex-1 text-center text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 rounded-lg transition">
                         Bewerken
                     </a>
-                    <form action="{{ route('product.toggle', $product->id) }}" method="POST" class="flex-1">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                            class="w-full text-xs font-medium py-1 rounded-lg transition
-                                {{ $product->is_active
-                                    ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100'
-                                    : 'bg-green-200 text-green-800 hover:bg-green-300' }}">
-                            {{ $product->is_active ? 'Verbergen' : 'Tonen' }}
-                        </button>
-                    </form>
+                    <button type="button"
+                        onclick="toggleProduct({{ $product->id }}, this)"
+                        data-active="{{ $product->is_active ? '1' : '0' }}"
+                        class="flex-1 text-xs font-medium py-1 rounded-lg transition
+                            {{ $product->is_active ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100' : 'bg-green-200 text-green-800 hover:bg-green-300' }}">
+                        {{ $product->is_active ? 'Verbergen' : 'Tonen' }}
+                    </button>
                     <button type="button"
                         onclick="deleteProduct({{ $product->id }}, this)"
                         class="flex-1 text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 py-1 rounded-lg transition">
@@ -382,6 +378,37 @@ function updateNavCartBadge(total) {
     } else {
         badge.classList.add('hidden');
     }
+}
+
+// ── Product tonen/verbergen (AJAX) ───────────────────────────────
+function toggleProduct(id, btn) {
+    fetch('/product/' + id + '/toggle', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-HTTP-Method-Override': 'PATCH',
+        },
+        body: JSON.stringify({ _method: 'PATCH' }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        const isActive = data.is_active;
+        btn.dataset.active = isActive ? '1' : '0';
+        btn.textContent = isActive ? 'Verbergen' : 'Tonen';
+        btn.className = 'flex-1 text-xs font-medium py-1 rounded-lg transition ' +
+            (isActive ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100' : 'bg-green-200 text-green-800 hover:bg-green-300');
+
+        // Opacité de la carte
+        const card = btn.closest('.bg-white');
+        card.querySelectorAll('.opacity-50').forEach(el => el.classList.remove('opacity-50'));
+        if (!isActive) {
+            card.querySelectorAll('img, h3, p, .flex-shrink-0').forEach(el => el.classList.add('opacity-50'));
+        }
+
+        showToast(isActive ? 'Product getoond' : 'Product verborgen');
+    });
 }
 
 // ── Product verwijderen (AJAX) ────────────────────────────────────

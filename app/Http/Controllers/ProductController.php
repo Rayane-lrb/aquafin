@@ -191,11 +191,15 @@ class ProductController extends Controller
         return redirect()->route('product.index');
     }
 
-    public function toggle(string $id)
+    public function toggle(Request $request, string $id)
     {
         $this->authorizeManage();
         $product = Product::findOrFail($id);
         $product->update(['is_active' => ! $product->is_active]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['is_active' => $product->is_active]);
+        }
 
         return redirect()->route('product.index');
     }
