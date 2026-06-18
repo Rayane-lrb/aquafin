@@ -22,11 +22,13 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'name'      => ['required', 'string', 'max:255'],
+            'address'   => ['nullable', 'string', 'max:255'],
+            'latitude'  => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
-        Warehouse::create($request->only('name', 'address'));
+        Warehouse::create($request->only('name', 'address', 'latitude', 'longitude'));
 
         return redirect()->route('warehouse.index');
     }
@@ -41,11 +43,13 @@ class WarehouseController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'name'      => ['required', 'string', 'max:255'],
+            'address'   => ['nullable', 'string', 'max:255'],
+            'latitude'  => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
-        Warehouse::findOrFail($id)->update($request->only('name', 'address'));
+        Warehouse::findOrFail($id)->update($request->only('name', 'address', 'latitude', 'longitude'));
 
         return redirect()->route('warehouse.index');
     }

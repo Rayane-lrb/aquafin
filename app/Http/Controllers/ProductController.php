@@ -52,10 +52,11 @@ class ProductController extends Controller
         $isRaining       = false;
         $currentPrecip   = 0;
         $neerslagProducts = collect();
+        $warehouse = auth()->user()?->defaultWarehouse ?? \App\Models\Warehouse::first();
         try {
             $weather = Http::timeout(3)->get('https://api.open-meteo.com/v1/forecast', [
-                'latitude'  => 51.2194,
-                'longitude' => 4.4025,
+                'latitude'  => $warehouse?->latitude  ?? 51.2194,
+                'longitude' => $warehouse?->longitude ?? 4.4025,
                 'current'   => 'precipitation,rain',
                 'timezone'  => 'Europe/Brussels',
             ]);

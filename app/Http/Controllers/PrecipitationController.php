@@ -11,8 +11,10 @@ class PrecipitationController extends Controller
 {
     public function index()
     {
-        $lat = 51.2194;
-        $lon = 4.4025;
+        $user      = auth()->user();
+        $warehouse = $user?->defaultWarehouse ?? \App\Models\Warehouse::first();
+        $lat = $warehouse?->latitude  ?? 51.2194;
+        $lon = $warehouse?->longitude ?? 4.4025;
 
         try {
             // Huidige weer + 7 dagen
