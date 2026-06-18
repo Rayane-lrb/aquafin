@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ── Bestellingen ──────────────────────────────────────────────────────
     Route::get('/order',                  [OrderController::class, 'index'])->name('order.index');      // mijn bestellingen (technieker)
     Route::get('/order/magazijn',         [OrderController::class, 'magazijn'])->name('order.magazijn'); // beheer (magazijnBeheerder)
+    Route::get('/order/levering',         [OrderController::class, 'levering'])->name('order.levering'); // leveringslijst vandaag
     Route::get('/order/create',           [OrderController::class, 'create'])->name('order.create');
     Route::post('/order',                 [OrderController::class, 'store'])->name('order.store');
     Route::get('/order/{id}/edit',        [OrderController::class, 'edit'])->name('order.edit');
