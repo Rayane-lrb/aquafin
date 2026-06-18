@@ -72,26 +72,12 @@ class ProductController extends Controller
                 ->get();
         }
 
-        // Suggesties: neerslag-producten als het regent, anders meest besteld
-        if ($isRaining) {
-            $suggestedProducts = $neerslagProducts->take(6);
-            $suggestLabel      = 'Aanbevolen bij neerslag';
-            $suggestSub        = number_format($currentPrecip, 1) . ' mm/u gedetecteerd';
-        } else {
-            $suggestedProducts = Product::where('is_active', true)
-                ->whereHas('orders')
-                ->withCount('orders')
-                ->orderByDesc('orders_count')
-                ->whereNotIn('id', array_keys(session('cart', [])))
-                ->limit(6)
-                ->get();
-
-            if ($suggestedProducts->isEmpty()) {
-                $suggestedProducts = Product::where('is_active', true)->latest()->limit(6)->get();
-            }
-            $suggestLabel = 'Aanbevolen producten';
-            $suggestSub   = 'Meest besteld';
-        }
+        $suggestedProducts = Product::where('is_active', true)
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+        $suggestLabel = 'Aanbevolen producten';
+        $suggestSub   = '';
 
         return view('product.index', [
             'products'         => $products,
