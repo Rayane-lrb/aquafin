@@ -20,8 +20,9 @@
     $nav = [
         ['route' => 'product.*',        'href' => route('product.index'),        'label' => 'Catalogus',   'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10'],
         ...($role !== 'magazijnBeheerder' ? [['route' => 'cart.*', 'href' => route('cart.index'), 'label' => 'Mandje', 'icon' => 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z', 'badge' => $cartCount]] : []),
-        ['route' => 'order.index',      'href' => route('order.index'),          'label' => $role === 'magazijnBeheerder' ? 'Orders' : 'Mijn Orders', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+        ['route' => in_array($role, ['magazijnBeheerder', 'admin']) ? 'order.magazijn' : 'order.index', 'href' => in_array($role, ['magazijnBeheerder', 'admin']) ? route('order.magazijn') : route('order.index'), 'label' => in_array($role, ['magazijnBeheerder', 'admin']) ? 'Bestellingen' : 'Mijn Orders', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
 
+        ...( in_array($role, ['magazijnBeheerder', 'admin']) ? [['route' => 'order.levering', 'href' => route('order.levering'), 'label' => 'Leveringen', 'icon' => 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4']] : []),
         ['route' => 'neerslag.*',       'href' => route('neerslag.index'),       'label' => 'Neerslag',    'icon' => 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z'],
         ['route' => 'productcategory.*','href' => route('productcategory.index'),'label' => 'Categorieën', 'icon' => 'M7 7h.01M7 3h5l6 6v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z'],
         ...($role === 'admin' ? [['route' => 'warehouse.*', 'href' => route('warehouse.index'), 'label' => 'Werfplaatsen', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4']] : []),
@@ -64,7 +65,12 @@
                     {{ $item['label'] }}
                 </span>
 
-                @if (!empty($item['badge']) && $item['badge'] > 0)
+                @if (isset($item['route']) && str_starts_with($item['route'], 'cart'))
+                    <span id="nav-cart-badge"
+                          class="ml-auto bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none {{ $cartCount > 0 ? '' : 'hidden' }}">
+                        {{ $cartCount }}
+                    </span>
+                @elseif (!empty($item['badge']) && $item['badge'] > 0)
                     <span class="ml-auto bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
                         {{ $item['badge'] }}
                     </span>
