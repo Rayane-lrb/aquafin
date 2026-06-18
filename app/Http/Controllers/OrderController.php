@@ -275,9 +275,18 @@ class OrderController extends Controller
     //  Group actions
     // ──────────────────────────────────────────────────────────────
 
+    private function ordersForGroup(string $groupId)
+    {
+        if (str_starts_with($groupId, 'solo-')) {
+            $orderId = (int) str_replace('solo-', '', $groupId);
+            return Order::where('id', $orderId);
+        }
+        return Order::where('order_group_id', $groupId);
+    }
+
     public function groupApprove(Request $request, string $groupId)
     {
-        $orders = Order::where('order_group_id', $groupId)
+        $orders = $this->ordersForGroup($groupId)
             ->where('status', OrderStatus::Pending->value)
             ->with('product')
             ->get();
@@ -296,7 +305,7 @@ class OrderController extends Controller
 
     public function groupReject(Request $request, string $groupId)
     {
-        Order::where('order_group_id', $groupId)
+        $this->ordersForGroup($groupId)
             ->where('status', OrderStatus::Pending->value)
             ->update(['status' => OrderStatus::Rejected->value]);
 
@@ -307,15 +316,14 @@ class OrderController extends Controller
     {
         $request->validate(['delivery_date' => ['nullable', 'date']]);
 
-        Order::where('order_group_id', $groupId)
-            ->update(['delivery_date' => $request->delivery_date]);
+        $this->ordersForGroup($groupId)->update(['delivery_date' => $request->delivery_date]);
 
         return redirect()->route('order.magazijn');
     }
 
     public function groupDeliver(Request $request, string $groupId)
     {
-        $toDeliver = Order::where('order_group_id', $groupId)
+        $toDeliver = $this->ordersForGroup($groupId)
             ->where('status', OrderStatus::Approved->value)
             ->with(['user', 'product'])
             ->get();
