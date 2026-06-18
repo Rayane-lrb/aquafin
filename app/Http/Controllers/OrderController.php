@@ -129,7 +129,8 @@ class OrderController extends Controller
         }
 
         $product->decrement('stock', $order->quantity);
-        $deliveryDate = $order->urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d');
+        $deliveryDate = $order->delivery_date
+            ?? ($order->urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d'));
         $order->update(['status' => OrderStatus::Approved->value, 'delivery_date' => $deliveryDate]);
         $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
 
@@ -294,7 +295,8 @@ class OrderController extends Controller
         foreach ($orders as $order) {
             if ($order->product->stock >= $order->quantity) {
                 $order->product->decrement('stock', $order->quantity);
-                $deliveryDate = $order->urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d');
+                $deliveryDate = $order->delivery_date
+                    ?? ($order->urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d'));
                 $order->update(['status' => OrderStatus::Approved->value, 'delivery_date' => $deliveryDate]);
                 $order->user->notify(new OrderStatusUpdated($order->fresh(['product'])));
             }
