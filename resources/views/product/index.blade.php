@@ -184,75 +184,25 @@
             @endif
         </div>
 
-        @if (! $showCategories)
-        {{-- Kleine categoriekaarten — horizontaal scrollbaar --}}
+        {{-- Categorie pills (altijd zichtbaar) --}}
         <div class="flex gap-2 overflow-x-auto pb-1 snap-x" style="scrollbar-width: none;">
             <a href="{{ route('product.index', array_filter(['search' => $query])) }}"
-               class="snap-start shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition text-center
-                      {{ ! $selectedCategory ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:shadow-sm' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-                <span class="text-xs font-medium whitespace-nowrap">Alle</span>
+               class="snap-start shrink-0 px-3 py-1.5 rounded-full border text-xs font-medium transition whitespace-nowrap
+                      {{ ! $selectedCategory ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300' }}">
+                Alle
             </a>
             @foreach ($categories as $cat)
             @php $isActive = (string) $selectedCategory === (string) $cat->id; @endphp
             <a href="{{ route('product.index', array_filter(['search' => $query, 'category' => $cat->id])) }}"
-               class="snap-start shrink-0 flex flex-col items-center gap-1 rounded-xl border transition overflow-hidden text-center
-                      {{ $isActive ? 'border-blue-500 ring-2 ring-blue-300' : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-sm' }}"
-               style="width: 72px;">
-                {{-- Miniatuur afbeelding --}}
-                <div class="w-full h-12 bg-gray-50 flex items-center justify-center overflow-hidden">
-                    @if ($cat->preview_image)
-                        <img src="{{ asset('storage/' . $cat->preview_image) }}"
-                             alt="{{ $cat->name }}"
-                             class="w-full h-full object-contain p-1">
-                    @else
-                        <svg class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0v10l-8 4m0-10L4 7m8 4v10"/>
-                        </svg>
-                    @endif
-                </div>
-                <span class="text-xs font-medium px-1 pb-1.5 leading-tight line-clamp-2
-                             {{ $isActive ? 'text-blue-700' : 'text-gray-600' }}">
-                    {{ $cat->name }}
-                </span>
+               class="snap-start shrink-0 px-3 py-1.5 rounded-full border text-xs font-medium transition whitespace-nowrap
+                      {{ $isActive ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300' }}">
+                {{ $cat->name }}
             </a>
             @endforeach
         </div>
-        @endif
     </form>
 
-    @if ($showCategories)
-    {{-- Categorie-kaarten --}}
-    <div class="flex items-center justify-center gap-3 mb-4">
-        <h2 class="text-base font-bold text-gray-900 tracking-tight">Categorieën</h2>
-        <span class="bg-blue-50 text-blue-400 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $categories->count() }}</span>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        @foreach ($categories as $cat)
-        <a href="{{ route('product.index', ['category' => $cat->id]) }}"
-           class="group bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-            <div class="h-36 bg-gray-50 overflow-hidden flex items-center justify-center">
-                @if ($cat->preview_image)
-                    <img src="{{ asset('storage/' . $cat->preview_image) }}"
-                         alt="{{ $cat->name }}"
-                         class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300">
-                @else
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                @endif
-            </div>
-            <div class="p-3">
-                <h3 class="font-semibold text-gray-800 text-sm truncate">{{ $cat->name }}</h3>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $cat->product_count }} product{{ $cat->product_count !== 1 ? 'en' : '' }}</p>
-            </div>
-        </a>
-        @endforeach
-    </div>
-
-    @elseif ($products->isEmpty())
+    @if ($products->isEmpty())
         <div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
             Geen producten gevonden.
         </div>

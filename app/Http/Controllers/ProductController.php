@@ -28,17 +28,14 @@ class ProductController extends Controller
             return $cat;
         });
 
-        $products = collect();
-        if (! $showCategories) {
-            $products = Product::query()
-                ->when($role === 'technieker', fn ($q) => $q->where('is_active', true))
-                ->when($query, fn ($q) => $q->where(function ($sub) use ($query) {
-                    $sub->where('name', 'LIKE', "%{$query}%")
-                        ->orWhere('barcode', 'LIKE', "%{$query}%");
-                }))
-                ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
-                ->get();
-        }
+        $products = Product::query()
+            ->when($role === 'technieker', fn ($q) => $q->where('is_active', true))
+            ->when($query, fn ($q) => $q->where(function ($sub) use ($query) {
+                $sub->where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('barcode', 'LIKE', "%{$query}%");
+            }))
+            ->when($selectedCategory, fn ($q) => $q->where('product_category_id', $selectedCategory))
+            ->get();
 
         $cartQty        = session('cart', []);
         $favoriteIds    = auth()->user()->favoriteProducts()->pluck('products.id')->flip();
