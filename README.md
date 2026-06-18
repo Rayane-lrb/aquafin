@@ -19,6 +19,10 @@ Een rolgebaseerde voorraad- en bestelbeheerapplicatie gebouwd met Laravel 13, Al
 - **Sorteerbare tabellen** — Klik op elke `<th>` om kolommen aan de clientzijde te sorteren.
 - **Mobielvriendelijk** — Inklapbare zijbalk met overlay, aanpasbare kaartroosters.
 
+
+## Open-Meteo
+We gebruiken de gratis API van [Open-Meteo](https://open-meteo.com/) om gegevens op te halen over de neerslag
+
 ## Rollen
 
 | Rol | Machtigingen |
