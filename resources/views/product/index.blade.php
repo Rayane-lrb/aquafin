@@ -25,54 +25,6 @@
 
     @php $role = auth()->user()?->role; @endphp
 
-    {{-- ── TECHNIEKER: statusupdates van bestellingen ── --}}
-    @if($role === 'technieker')
-    @php $unread = auth()->user()->unreadNotifications->take(5); @endphp
-    @if($unread->isNotEmpty())
-    <div id="notif-card" class="fixed bottom-6 right-6 z-50 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        {{-- Header --}}
-        <div class="flex items-center justify-between px-4 py-3 bg-blue-600">
-            <div class="flex items-center gap-2 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                </svg>
-                <span class="text-sm font-semibold">Meldingen</span>
-                <span class="bg-white/30 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{{ $unread->count() }}</span>
-            </div>
-            <button onclick="sluitAlleNotifs()" class="text-white/70 hover:text-white transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        {{-- Notificaties --}}
-        <div class="divide-y divide-gray-50 max-h-72 overflow-y-auto" id="notif-list">
-            @foreach($unread as $notif)
-            @php $d = $notif->data; $status = $d['status'] ?? ''; @endphp
-            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition" data-id="{{ $notif->id }}">
-                <div class="mt-0.5 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
-                    {{ $status === 'goedgekeurd' ? 'bg-green-100' : ($status === 'geleverd' ? 'bg-blue-100' : 'bg-red-100') }}">
-                    <span class="text-base">{{ $d['icon'] ?? '📦' }}</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-semibold text-gray-800 leading-snug">{{ $d['message'] ?? '' }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
-                </div>
-                <button onclick="sluitNotif(this)" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-            @endforeach
-        </div>
-        {{-- Footer --}}
-        <div class="px-4 py-2 border-t border-gray-100 bg-gray-50">
-            <a href="{{ route('order.index') }}" class="text-xs text-blue-600 hover:underline font-medium">Alle bestellingen bekijken →</a>
-        </div>
-    </div>
-    @endif
-    @endif
 
     {{-- ── MAGAZIJNBEHEERDER: openstaande + urgente bestellingen ── --}}
     @if($role === 'magazijnBeheerder' && ($pendingCount > 0 || $urgentCount > 0))
@@ -97,7 +49,7 @@
         {{-- Inhoud --}}
         <div class="divide-y divide-gray-50">
             {{-- Pending --}}
-            <a href="{{ route('order.index') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
+            <a href="{{ route('order.magazijn') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
                 <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -111,7 +63,7 @@
             </a>
             {{-- Urgent --}}
             @if($urgentCount > 0)
-            <a href="{{ route('order.index') }}" class="flex items-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 transition">
+            <a href="{{ route('order.magazijn') }}" class="flex items-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 transition">
                 <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 relative">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-40"></span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 relative" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -119,7 +71,7 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <p class="text-xs font-semibold text-red-700">🚨 DRINGEND</p>
+                    <p class="text-xs font-semibold text-red-700">DRINGEND</p>
                     <p class="text-xs text-red-500">{{ $urgentCount }} urgente bestelling{{ $urgentCount !== 1 ? 'en' : '' }}</p>
                 </div>
                 <span class="text-sm font-bold text-red-600">{{ $urgentCount }}</span>
@@ -129,9 +81,6 @@
             @foreach($unreadNotifs as $notif)
             @php $d = $notif->data; @endphp
             <div class="flex items-start gap-3 px-4 py-3">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-base">
-                    {{ $d['icon'] ?? '📦' }}
-                </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-xs font-semibold text-gray-800 leading-snug">{{ $d['message'] ?? '' }}</p>
                     <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
@@ -141,7 +90,7 @@
         </div>
         {{-- Footer --}}
         <div class="px-4 py-2 border-t border-gray-100 bg-gray-50">
-            <a href="{{ route('order.index') }}" class="text-xs text-blue-600 hover:underline font-medium">Alle bestellingen beheren →</a>
+            <a href="{{ route('order.magazijn') }}" class="text-xs text-blue-600 hover:underline font-medium">Alle bestellingen beheren →</a>
         </div>
     </div>
     @endif
@@ -149,13 +98,13 @@
     {{-- ══ SUGGESTIES ══════════════════════════════════════════════ --}}
     @if($showCategories && $suggestedProducts->isNotEmpty())
     <div class="mb-6">
-        <div class="flex items-center justify-between mb-3">
-            <h2 class="text-sm font-semibold text-gray-700">{{ $suggestLabel }}</h2>
-            <span class="text-xs text-gray-400">{{ $suggestSub }}</span>
+        <div class="text-center mb-4">
+            <h2 class="text-base font-bold text-gray-900 tracking-tight">{{ $suggestLabel }}</h2>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $suggestSub }}</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             @foreach($suggestedProducts as $sp)
-            <button type="button" onclick="openModal({{ $sp->id }})"
+            <a href="{{ route('product.show', $sp->id) }}"
                 class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition p-3 flex flex-col items-center gap-2 text-left group">
                 @if($sp->image)
                     <img src="{{ asset('storage/' . $sp->image) }}" class="w-14 h-14 object-cover rounded-xl" alt="{{ $sp->name }}">
@@ -168,7 +117,7 @@
                 @endif
                 <p class="text-xs font-semibold text-gray-700 text-center leading-tight group-hover:text-blue-700 transition line-clamp-2">{{ $sp->name }}</p>
                 <span class="text-xs text-gray-400">Stock: {{ $sp->stock }}</span>
-            </button>
+            </a>
             @endforeach
         </div>
     </div>
@@ -177,9 +126,9 @@
     {{-- ══ FAVORIETEN — alleen op de startpagina ══════════════════ --}}
     @if ($showCategories && $favoriteProducts->isNotEmpty())
     <div class="mb-8">
-        <div class="flex items-center gap-2 mb-3">
-            <span class="text-sm font-semibold text-gray-700">❤️ Mijn favorieten</span>
-            <span class="text-xs text-gray-400">({{ $favoriteProducts->count() }})</span>
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <h2 class="text-base font-bold text-gray-900 tracking-tight">❤️ Mijn favorieten</h2>
+            <span class="bg-red-50 text-red-400 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $favoriteProducts->count() }}</span>
         </div>
 
         {{-- Glissende kaarten (zelfde stijl als categoriekaarten) --}}
@@ -241,7 +190,9 @@
             <a href="{{ route('product.index', array_filter(['search' => $query])) }}"
                class="snap-start shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition text-center
                       {{ ! $selectedCategory ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:shadow-sm' }}">
-                <span class="text-lg">🗂️</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
                 <span class="text-xs font-medium whitespace-nowrap">Alle</span>
             </a>
             @foreach ($categories as $cat)
@@ -274,7 +225,10 @@
 
     @if ($showCategories)
     {{-- Categorie-kaarten --}}
-    <p class="text-xs text-gray-400 mb-3">{{ $categories->count() }} categorieën</p>
+    <div class="flex items-center justify-center gap-3 mb-4">
+        <h2 class="text-base font-bold text-gray-900 tracking-tight">Categorieën</h2>
+        <span class="bg-blue-50 text-blue-400 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $categories->count() }}</span>
+    </div>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         @foreach ($categories as $cat)
         <a href="{{ route('product.index', ['category' => $cat->id]) }}"
@@ -303,28 +257,31 @@
             Geen producten gevonden.
         </div>
     @else
-    <p class="text-xs text-gray-400 mb-3">{{ $products->count() }} product{{ $products->count() !== 1 ? 'en' : '' }} beschikbaar</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div class="flex items-center justify-center gap-3 mb-4">
+        <h2 class="text-base font-bold text-gray-900 tracking-tight">Producten</h2>
+        <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">{{ $products->count() }} beschikbaar</span>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
         @foreach ($products as $product)
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-row sm:flex-col {{ !$product->is_active ? 'border-2 border-red-400' : '' }} {{ $product->stock == 0 ? 'border-2 border-red-400' : '' }}">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col {{ !$product->is_active ? 'border-2 border-red-400' : '' }} {{ $product->stock == 0 ? 'border-2 border-red-400' : '' }}">
 
             <div class="flex-shrink-0 {{ !$product->is_active ? 'opacity-50' : '' }} {{ $product->stock == 0 ? 'opacity-50' : '' }}">
             @if ($product->image)
                 <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
-                    class="w-20 h-20 sm:w-full sm:h-40 object-contain object-center p-2 sm:p-3 bg-white">
+                    class="w-full h-36 object-contain object-center p-3 bg-white">
             @else
-                <div class="w-20 h-20 sm:w-full sm:h-40 bg-gray-100 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-12 sm:w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-full h-36 bg-gray-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
             @endif
             </div>
 
-            <div class="p-3 sm:p-4 flex-1 flex flex-col min-w-0">
+            <div class="p-3 flex-1 flex flex-col min-w-0">
                 <div class="flex items-start justify-between gap-1">
                     <div class="min-w-0">
-                        <h3 class="font-semibold text-gray-900 text-xs sm:text-sm truncate {{ !$product->is_active ? 'opacity-50' : '' }}">{{ $product->name }}</h3>
+                        <h3 class="font-semibold text-gray-900 text-xs leading-tight line-clamp-2 {{ !$product->is_active ? 'opacity-50' : '' }}">{{ $product->name }}</h3>
                         <p class="text-xs text-gray-400 mt-0.5 truncate {{ !$product->is_active ? 'opacity-50' : '' }}">{{ optional($product->category)->name ?? '—' }}</p>
                     </div>
                     <button type="button"
@@ -338,7 +295,7 @@
                     </button>
                 </div>
 
-                <div class="mt-2 sm:mt-3 flex items-center justify-between {{ !$product->is_active ? 'opacity-50' : '' }}">
+                <div class="mt-2 flex items-center justify-between {{ !$product->is_active ? 'opacity-50' : '' }}">
                     <span class="text-xs {{ $product->stock <= 5 ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
                         Stock: {{ $product->stock }}
                     </span>
@@ -361,9 +318,9 @@
                 {{-- Bestellen (technieker) --}}
                 @if ((Auth::user()?->role === 'technieker' || Auth::user()?->role === 'admin') && $product->is_active)
                 <div class="mt-2 sm:mt-4 pt-2 sm:pt-3 border-t border-gray-100 space-y-2">
-                    <div class="flex items-center gap-1.5 sm:gap-2">
+                    <div class="flex items-center gap-1.5">
                         <button type="button" onclick="updateCart({{ $product->id }}, -1)"
-                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs sm:text-sm">
+                            class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs">
                             −
                         </button>
                         <input type="number" id="qty-{{ $product->id }}"
@@ -372,12 +329,12 @@
                             onchange="setCart({{ $product->id }}, this.value)"
                             class="w-12 text-center text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                         <button type="button" onclick="updateCart({{ $product->id }}, 1)"
-                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs sm:text-sm">
+                            class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 font-bold transition text-xs">
                             +
                         </button>
                         <button type="button" onclick="goToCart({{ $product->id }})"
-                            class="ml-auto text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            class="ml-auto text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-lg transition flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
                             </svg>
                             Mandje
@@ -388,16 +345,16 @@
 
                 {{-- Bewerken/Verwijderen/Toggle (admin + magazijnBeheerder) --}}
                 @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
-                <div class="mt-2 flex gap-1.5 sm:gap-2">
+                <div class="mt-2 flex gap-1.5">
                     <a href="{{ route('product.edit', $product->id) }}"
-                        class="flex-1 text-center text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 sm:py-1.5 rounded-lg transition">
+                        class="flex-1 text-center text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 rounded-lg transition">
                         Bewerken
                     </a>
                     <form action="{{ route('product.toggle', $product->id) }}" method="POST" class="flex-1">
                         @csrf
                         @method('PATCH')
                         <button type="submit"
-                            class="w-full text-xs font-medium py-1 sm:py-1.5 rounded-lg transition
+                            class="w-full text-xs font-medium py-1 rounded-lg transition
                                 {{ $product->is_active
                                     ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100'
                                     : 'bg-green-200 text-green-800 hover:bg-green-300' }}">
@@ -406,7 +363,7 @@
                     </form>
                     <button type="button"
                         onclick="deleteProduct({{ $product->id }}, this)"
-                        class="flex-1 text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 py-1 sm:py-1.5 rounded-lg transition">
+                        class="flex-1 text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 py-1 rounded-lg transition">
                         Verwijderen
                     </button>
                 </div>
@@ -425,7 +382,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
-        <h2 class="text-lg font-bold text-gray-800 mb-4">Aanbevolen Producten</h2>
+        <h2 class="text-lg font-bold text-gray-900 tracking-tight mb-1">Misschien ook interessant?</h2>
+        <p class="text-xs text-gray-400 mb-4">Producten uit dezelfde categorie</p>
         <div id="recommended-list" class="grid grid-cols-3 gap-3 mb-6"></div>
         <div class="flex gap-3">
             <button onclick="closeModal()"
@@ -441,6 +399,19 @@
 </div>
 
 <script>
+const IS_TECHNIEKER = {{ auth()->user()?->role === 'technieker' ? 'true' : 'false' }};
+
+function updateNavCartBadge(total) {
+    const badge = document.getElementById('nav-cart-badge');
+    if (!badge) return;
+    if (total > 0) {
+        badge.textContent = total;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
 // ── Product verwijderen (AJAX) ────────────────────────────────────
 function deleteProduct(id, btn) {
     if (!confirm('Dit product verwijderen?')) return;
@@ -506,7 +477,7 @@ function toggleFavorite(productId, btn) {
         }
 
         // Toast + herladen om balk te vernieuwen
-        showToast(isFav ? '❤️ Toegevoegd aan favorieten' : '🗑️ Verwijderd uit favorieten');
+        showToast(isFav ? 'Toegevoegd aan favorieten' : 'Verwijderd uit favorieten');
         setTimeout(() => window.location.reload(), 800);
     });
 }
@@ -556,7 +527,7 @@ function updateCart(productId, change) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) qtyEl.value = newQty;
+        if (data.success) { qtyEl.value = newQty; updateNavCartBadge(data.totalQuantity); }
     });
 }
 
@@ -568,7 +539,9 @@ function setCart(productId, value) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
         body: JSON.stringify({ quantity: newQty })
-    });
+    })
+    .then(res => res.json())
+    .then(data => { if (data.totalQuantity !== undefined) updateNavCartBadge(data.totalQuantity); });
 }
 
 // ── Mandje knop: toon aanbevelingen dan ga naar mandje ────────────
@@ -583,7 +556,8 @@ function goToCart(productId) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.recommended && data.recommended.length > 0) {
+        if (data.totalQuantity !== undefined) updateNavCartBadge(data.totalQuantity);
+        if (!IS_TECHNIEKER && data.recommended && data.recommended.length > 0) {
             showRecommended(data.recommended);
         } else {
             window.location.href = '{{ route("cart.index") }}';
@@ -605,61 +579,7 @@ function addRecommended(productId) {
 
 // ── Notificaties ────────────────────────────────────────────────────────
 
-// TECHNIEKER — mémorise les IDs fermés dans localStorage
-const DISMISSED_KEY = 'notif_dismissed_ids_{{ auth()->id() }}';
-
-function getDismissed() {
-    try { return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]'); } catch { return []; }
-}
-function saveDismissed(ids) {
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify(ids));
-}
-
-function sluitNotif(btn) {
-    const item = btn.closest('.notif-item');
-    const id   = item.dataset.id;
-    fetch('/notifications/' + id + '/read', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-    });
-    const dismissed = getDismissed();
-    dismissed.push(id);
-    saveDismissed(dismissed);
-    item.remove();
-    const list = document.getElementById('notif-list');
-    if (list && list.querySelectorAll('.notif-item').length === 0) {
-        document.getElementById('notif-card')?.remove();
-    }
-}
-
-function sluitAlleNotifs() {
-    fetch('/notifications/read-all', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-    });
-    // Sauvegarder tous les IDs visibles
-    const items = document.querySelectorAll('#notif-card .notif-item');
-    const dismissed = getDismissed();
-    items.forEach(i => dismissed.push(i.dataset.id));
-    saveDismissed(dismissed);
-    document.getElementById('notif-card')?.remove();
-}
-
-// Filtrer les notifs déjà fermées au chargement
 document.addEventListener('DOMContentLoaded', function () {
-    const dismissed = getDismissed();
-    const card = document.getElementById('notif-card');
-    if (card) {
-        dismissed.forEach(id => {
-            document.querySelector(`.notif-item[data-id="${id}"]`)?.remove();
-        });
-        const list = document.getElementById('notif-list');
-        if (!list || list.querySelectorAll('.notif-item').length === 0) {
-            card.remove();
-        }
-        // Sinon afficher la carte
-    }
-
     // MAG — afficher seulement si nouveau ou pas encore fermé
     const magCard = document.getElementById('notif-card-mag');
     if (magCard) {
