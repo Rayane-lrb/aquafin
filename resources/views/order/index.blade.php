@@ -6,59 +6,6 @@
          class="fixed top-4 right-4 z-50 hidden max-w-sm text-sm font-medium px-4 py-3 rounded-xl shadow-lg">
     </div>
 
-    {{-- ══ MELDINGEN voor technieker ═══════════════════════════════ --}}
-    @if (Auth::user()->role === 'technieker')
-    @php $unread = auth()->user()->unreadNotifications; @endphp
-    @if ($unread->isNotEmpty())
-    <div id="melding-container" class="space-y-2 mb-6">
-        @foreach ($unread as $notif)
-        @php $d = $notif->data; @endphp
-        <div class="melding-item flex items-start gap-3 bg-white border-l-4 rounded-xl shadow-sm px-4 py-3
-                    {{ $d['status'] === 'goedgekeurd' ? 'border-green-500' : ($d['status'] === 'geleverd' ? 'border-blue-500' : 'border-red-400') }}"
-             data-id="{{ $notif->id }}">
-            <span class="text-xl shrink-0 mt-0.5">{{ $d['icon'] }}</span>
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-800">{{ $d['message'] }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
-            </div>
-            <button onclick="sluitMelding(this)" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        @endforeach
-    </div>
-    <script>
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-    function sluitMelding(btn) {
-        const item = btn.closest('.melding-item');
-        item.style.transition = 'opacity .3s, transform .3s';
-        item.style.opacity = '0';
-        item.style.transform = 'translateX(20px)';
-        setTimeout(() => item.remove(), 300);
-
-        // Als alle meldingen gesloten → markeer als gelezen
-        const container = document.getElementById('melding-container');
-        if (!container.querySelector('.melding-item:not([style*="opacity: 0"])')) {
-            fetch('/notifications/read-all', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': csrfToken },
-            });
-        }
-    }
-
-    // Auto-markeer als gelezen na 8 seconden
-    setTimeout(() => {
-        fetch('/notifications/read-all', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-        });
-    }, 8000);
-    </script>
-    @endif
-    @endif
 
     {{-- Header acties --}}
     <div class="flex justify-between items-center mb-6">
@@ -99,9 +46,21 @@
         @endforeach
     </div>
 
+    @php
+        $isTech = Auth::user()->role === 'technieker';
+        if ($isTech) {
+            $activeGrouped    = $grouped->map(fn($g) => $g->filter(fn($o) => $o->status !== 'geleverd'))->filter(fn($g) => $g->isNotEmpty());
+            $deliveredOrders  = $orders->filter(fn($o) => $o->status === 'geleverd');
+            $groupedToShow    = $activeGrouped;
+        } else {
+            $groupedToShow   = $grouped;
+            $deliveredOrders = collect();
+        }
+    @endphp
+
     {{-- Orders gegroepeerd per gebruiker --}}
     <div id="groups-container">
-    @forelse ($grouped as $userId => $userOrders)
+    @forelse ($groupedToShow as $userId => $userOrders)
         @php
             $hasUrgent  = $userOrders->contains(fn($o) => $o->urgent);
             $firstOrder = $userOrders->first();
@@ -120,9 +79,9 @@
                 <span class="font-semibold text-gray-700 text-sm">{{ $firstOrder->user->name ?? '—' }}</span>
                 <span class="text-xs text-gray-400">({{ $userOrders->count() }} bestelling{{ $userOrders->count() !== 1 ? 'en' : '' }})</span>
                 @if ($hasUrgent)
-                    <span class="group-urgent-badge ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 DRINGEND</span>
+                    <span class="group-urgent-badge ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">DRINGEND</span>
                 @else
-                    <span class="group-urgent-badge hidden ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 DRINGEND</span>
+                    <span class="group-urgent-badge hidden ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">DRINGEND</span>
                 @endif
                 <svg class="collapse-arrow ml-auto w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -152,10 +111,26 @@
                             data-urgent="{{ ($order->urgent ?? false) ? '1' : '0' }}"
                             data-owner-id="{{ $order->user_id }}">
 
-                            {{-- Product + urgent badge --}}
+                            {{-- Product + urgent badge + leveringsdatum --}}
                             <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $order->product?->name ?? '—' }}
-                                <span class="urgent-badge {{ ($order->urgent ?? false) ? '' : 'hidden' }} ml-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">🚨 DRINGEND</span>
+                                <div class="flex flex-col gap-1">
+                                    {{ $order->product?->name ?? '—' }}
+                                    <span class="urgent-badge {{ ($order->urgent ?? false) ? '' : 'hidden' }} self-start bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">DRINGEND</span>
+                                    @if(Auth::user()->role === 'technieker')
+                                        @if($order->delivery_date)
+                                            @php $dl = now()->diffInDays(\Carbon\Carbon::parse($order->delivery_date), false); @endphp
+                                            <span class="text-xs font-medium {{ $dl < 0 ? 'text-red-500' : ($dl === 0 ? 'text-orange-500' : 'text-emerald-600') }}">
+                                                {{ \Carbon\Carbon::parse($order->delivery_date)->format('d/m/Y') }}
+                                                @if($dl < 0) (te laat)
+                                                @elseif($dl === 0) (vandaag)
+                                                @elseif($dl === 1) (morgen)
+                                                @endif
+                                            </span>
+                                        @elseif(in_array($order->status, ['goedgekeurd', 'in behandeling']))
+                                            <span class="text-xs text-gray-400 italic">datum onbekend</span>
+                                        @endif
+                                    @endif
+                                </div>
                             </td>
 
                             @if(Auth::user()->role !== 'technieker')
@@ -223,7 +198,7 @@
                                             <button type="submit"
                                                     class="urgent-toggle-btn text-xs font-medium px-3 py-1.5 rounded-lg transition border
                                                         {{ ($order->urgent ?? false) ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' : 'bg-white text-red-500 border-red-200 hover:bg-red-50' }}">
-                                                {{ ($order->urgent ?? false) ? '🚨 Opheffen' : '🚨 DRINGEND' }}
+                                                {{ ($order->urgent ?? false) ? 'Opheffen' : 'DRINGEND' }}
                                             </button>
                                         </form>
                                     @endif
@@ -249,6 +224,92 @@
         </div>
     @endforelse
     </div>
+
+    {{-- ── TECHNIEKER: geleverde bestellingen (inklapbaar) ── --}}
+    @if($isTech && $deliveredOrders->isNotEmpty())
+    <div class="mt-8">
+        <button type="button" onclick="toggleGeleverd()"
+            class="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition mb-3 select-none">
+            <svg id="geleverd-arrow" class="w-4 h-4 transition-transform duration-200 rotate-[-90deg]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+            <span>Geleverde bestellingen</span>
+            <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $deliveredOrders->count() }}</span>
+        </button>
+
+        <div id="geleverd-section" class="hidden">
+            <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                        <tr>
+                            <th class="px-6 py-3">Product</th>
+                            <th class="px-6 py-3">Aantal</th>
+                            <th class="px-6 py-3">Magazijn</th>
+                            <th class="px-6 py-3">Geleverd op</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($deliveredOrders->sortByDesc('delivery_date') as $order)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-medium text-gray-700">{{ $order->product?->name ?? '—' }}</td>
+                            <td class="px-6 py-4 text-gray-600">{{ $order->quantity }}</td>
+                            <td class="px-6 py-4 text-gray-600">{{ $order->warehouse?->name ?? '—' }}</td>
+                            <td class="px-6 py-4">
+                                @if($order->delivery_date)
+                                    <span class="text-xs font-semibold text-emerald-600">
+                                        ✓ {{ \Carbon\Carbon::parse($order->delivery_date)->format('d/m/Y') }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-gray-400">—</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ── TECHNIEKER: notif-kaart onderaan rechts ── --}}
+    @if(Auth::user()->role === 'technieker')
+    @php $unread = auth()->user()->unreadNotifications->take(5); @endphp
+    @if($unread->isNotEmpty())
+    <div id="notif-card-orders" class="fixed bottom-6 right-6 z-50 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-blue-600">
+            <div class="flex items-center gap-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="text-sm font-semibold">Meldingen</span>
+                <span class="bg-white/30 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{{ $unread->count() }}</span>
+            </div>
+            <button onclick="sluitAlleNotifsOrders()" class="text-white/70 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="divide-y divide-gray-50 max-h-72 overflow-y-auto" id="notif-list-orders">
+            @foreach($unread as $notif)
+            @php $d = $notif->data; $status = $d['status'] ?? ''; @endphp
+            <div class="notif-item-orders flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition" data-id="{{ $notif->id }}">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-gray-800 leading-snug">{{ $d['message'] ?? '' }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
+                </div>
+                <button onclick="sluitNotifOrders(this)" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    @endif
 
     {{-- Legende technieker --}}
     @if(Auth::user()->role === 'technieker')
@@ -406,7 +467,7 @@ function handleUrgentToggle(row, data) {
     // Knop tekst + stijl
     const btn = row.querySelector('.urgent-toggle-btn');
     if (btn) {
-        btn.textContent = isUrgent ? '🚨 Opheffen' : '🚨 DRINGEND';
+        btn.textContent = isUrgent ? 'Opheffen' : 'DRINGEND';
         btn.className = 'urgent-toggle-btn text-xs font-medium px-3 py-1.5 rounded-lg transition border '
             + (isUrgent
                 ? 'bg-red-600 text-white border-red-600 hover:bg-red-700'
@@ -442,6 +503,41 @@ function handleUrgentToggle(row, data) {
 /* ===================================================
    Toast notificaties
    =================================================== */
+/* ===================================================
+   Geleverde bestellingen — toggle
+   =================================================== */
+function toggleGeleverd() {
+    const section = document.getElementById('geleverd-section');
+    const arrow   = document.getElementById('geleverd-arrow');
+    const hidden  = section.classList.toggle('hidden');
+    arrow.style.transform = hidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
+/* ===================================================
+   Notif-kaart technieker (orders pagina)
+   =================================================== */
+function sluitNotifOrders(btn) {
+    const item = btn.closest('.notif-item-orders');
+    const id   = item.dataset.id;
+    fetch('/notifications/' + id + '/read', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    });
+    item.remove();
+    const list = document.getElementById('notif-list-orders');
+    if (list && list.querySelectorAll('.notif-item-orders').length === 0) {
+        document.getElementById('notif-card-orders')?.remove();
+    }
+}
+
+function sluitAlleNotifsOrders() {
+    fetch('/notifications/read-all', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    });
+    document.getElementById('notif-card-orders')?.remove();
+}
+
 function showToast(msg, type) {
     const toast = document.getElementById('aq-toast');
     toast.textContent = msg;
