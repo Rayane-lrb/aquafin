@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ProductController extends Controller
 {
@@ -41,6 +44,57 @@ class ProductController extends Controller
         $favoriteIds    = auth()->user()->favoriteProducts()->pluck('products.id')->flip();
         $favoriteProducts = auth()->user()->favoriteProducts()->where('is_active', true)->get();
 
+        $pendingCount = 0;
+        $urgentCount  = 0;
+        if ($role === 'magazijnBeheerder') {
+            $pendingCount = Order::where('status', OrderStatus::Pending->value)->count();
+            $urgentCount  = Order::where('status', OrderStatus::Pending->value)->where('urgent', true)->count();
+        }
+
+        // Neerslag check via Open-Meteo
+        $isRaining       = false;
+        $currentPrecip   = 0;
+        $neerslagProducts = collect();
+        try {
+            $weather = Http::timeout(3)->get('https://api.open-meteo.com/v1/forecast', [
+                'latitude'  => 51.2194,
+                'longitude' => 4.4025,
+                'current'   => 'precipitation,rain',
+                'timezone'  => 'Europe/Brussels',
+            ]);
+            if ($weather->ok()) {
+                $currentPrecip = $weather->json('current.precipitation') ?? 0;
+                $isRaining     = $currentPrecip > 0;
+            }
+        } catch (\Exception) {}
+
+        if ($isRaining) {
+            $neerslagProducts = Product::where('needed_on_rain', true)
+                ->where('is_active', true)
+                ->get();
+        }
+
+        // Suggesties: neerslag-producten als het regent, anders meest besteld
+        if ($isRaining) {
+            $suggestedProducts = $neerslagProducts->take(6);
+            $suggestLabel      = '🌧️ Aanbevolen bij neerslag';
+            $suggestSub        = number_format($currentPrecip, 1) . ' mm/u gedetecteerd';
+        } else {
+            $suggestedProducts = Product::where('is_active', true)
+                ->whereHas('orders')
+                ->withCount('orders')
+                ->orderByDesc('orders_count')
+                ->whereNotIn('id', array_keys(session('cart', [])))
+                ->limit(6)
+                ->get();
+
+            if ($suggestedProducts->isEmpty()) {
+                $suggestedProducts = Product::where('is_active', true)->latest()->limit(6)->get();
+            }
+            $suggestLabel = '⭐ Aanbevolen producten';
+            $suggestSub   = 'Meest besteld';
+        }
+
         return view('product.index', [
             'products'         => $products,
             'query'            => $query,
@@ -50,6 +104,14 @@ class ProductController extends Controller
             'showCategories'   => $showCategories,
             'favoriteIds'      => $favoriteIds,
             'favoriteProducts' => $favoriteProducts,
+            'suggestedProducts'  => $suggestedProducts,
+            'suggestLabel'       => $suggestLabel,
+            'suggestSub'         => $suggestSub,
+            'pendingCount'      => $pendingCount,
+            'urgentCount'       => $urgentCount,
+            'isRaining'         => $isRaining,
+            'currentPrecip'     => $currentPrecip,
+            'neerslagProducts'  => $neerslagProducts,
         ]);
     }
 
@@ -133,6 +195,8 @@ class ProductController extends Controller
         ]);
 
         $data = $request->only(['name', 'barcode', 'stock', 'product_category_id']);
+        $data['is_active']      = $request->boolean('is_active');
+        $data['needed_on_rain'] = $request->boolean('needed_on_rain');
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
