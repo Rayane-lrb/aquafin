@@ -18,13 +18,13 @@ class ProductController extends Controller
         $role             = auth()->user()?->role;
         $showCategories   = ! $query && ! $selectedCategory;
 
-        // Catégories avec image aléatoire et compteur de produits
+        // Catégories avec image fixe (premier produit avec image) et compteur de produits
         $categories = ProductCategory::all()->map(function ($cat) use ($role) {
             $q = Product::where('product_category_id', $cat->id)
                 ->when($role === 'technieker', fn ($q) => $q->where('is_active', true));
 
             $cat->product_count = $q->count();
-            $cat->preview_image = (clone $q)->whereNotNull('image')->inRandomOrder()->value('image');
+            $cat->preview_image = (clone $q)->whereNotNull('image')->orderBy('id')->value('image');
             return $cat;
         });
 
@@ -77,7 +77,7 @@ class ProductController extends Controller
         // Suggesties: neerslag-producten als het regent, anders meest besteld
         if ($isRaining) {
             $suggestedProducts = $neerslagProducts->take(6);
-            $suggestLabel      = '🌧️ Aanbevolen bij neerslag';
+            $suggestLabel      = 'Aanbevolen bij neerslag';
             $suggestSub        = number_format($currentPrecip, 1) . ' mm/u gedetecteerd';
         } else {
             $suggestedProducts = Product::where('is_active', true)
@@ -91,7 +91,7 @@ class ProductController extends Controller
             if ($suggestedProducts->isEmpty()) {
                 $suggestedProducts = Product::where('is_active', true)->latest()->limit(6)->get();
             }
-            $suggestLabel = '⭐ Aanbevolen producten';
+            $suggestLabel = 'Aanbevolen producten';
             $suggestSub   = 'Meest besteld';
         }
 
