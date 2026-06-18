@@ -203,13 +203,26 @@
     </form>
 
     @if ($showCategories && ! $query)
-    {{-- Categorie-kaarten zonder foto --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+    {{-- Categorie-kaarten met foto --}}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
         @foreach ($categories as $cat)
         <a href="{{ route('product.index', ['category' => $cat->id]) }}"
-           class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition p-4 flex flex-col gap-1">
-            <h3 class="font-semibold text-gray-800 text-sm truncate">{{ $cat->name }}</h3>
-            <p class="text-xs text-gray-400">{{ $cat->product_count }} product{{ $cat->product_count !== 1 ? 'en' : '' }}</p>
+           class="group bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="h-36 bg-gray-50 overflow-hidden flex items-center justify-center">
+                @if ($cat->preview_image)
+                    <img src="{{ asset('storage/' . $cat->preview_image) }}"
+                         alt="{{ $cat->name }}"
+                         class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300">
+                @else
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                @endif
+            </div>
+            <div class="p-3">
+                <h3 class="font-semibold text-gray-800 text-sm truncate">{{ $cat->name }}</h3>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $cat->product_count }} product{{ $cat->product_count !== 1 ? 'en' : '' }}</p>
+            </div>
         </a>
         @endforeach
     </div>
