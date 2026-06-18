@@ -15,7 +15,7 @@ class UserController extends Controller
         $users = User::when($request->filled('search'), fn ($q) => $q
             ->where('name', 'like', '%'.$request->search.'%')
             ->orWhere('email', 'like', '%'.$request->search.'%'))
-            ->orderByRaw("FIELD(role, 'admin', 'magazijnBeheerder', 'technieker')")
+            ->orderByRaw("CASE role WHEN 'admin' THEN 0 WHEN 'magazijnBeheerder' THEN 1 WHEN 'technieker' THEN 2 ELSE 3 END")
             ->get();
 
         return view('admin.users.index', ['users' => $users]);
