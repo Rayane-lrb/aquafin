@@ -60,8 +60,18 @@ class ProductController extends Controller
         return view('product.show', ['product' => $product]);
     }
 
+    // ── Beveiligingscheck: alleen admin & magazijnBeheerder ──────────────────
+    private function authorizeManage(): void
+    {
+        $role = auth()->user()?->role;
+        if (! in_array($role, ['admin', 'magazijnBeheerder'])) {
+            abort(403, 'Toegang geweigerd.');
+        }
+    }
+
     public function create()
     {
+        $this->authorizeManage();
         $categories = ProductCategory::all();
 
         return view('product.create', ['categories' => $categories]);
@@ -69,6 +79,7 @@ class ProductController extends Controller
 
     public function edit(string $id)
     {
+        $this->authorizeManage();
         $product = Product::findOrFail($id);
         $categories = ProductCategory::all();
 
@@ -77,6 +88,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeManage();
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'barcode' => ['nullable', 'string', 'max:50', 'unique:products,barcode'],
@@ -109,6 +121,7 @@ class ProductController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $this->authorizeManage();
         $product = Product::findOrFail($id);
 
         $request->validate([
@@ -132,6 +145,7 @@ class ProductController extends Controller
 
     public function toggle(string $id)
     {
+        $this->authorizeManage();
         $product = Product::findOrFail($id);
         $product->update(['is_active' => ! $product->is_active]);
 
@@ -140,6 +154,7 @@ class ProductController extends Controller
 
     public function destroy(string $id)
     {
+        $this->authorizeManage();
         $product = Product::findOrFail($id);
         $product->delete();
 
