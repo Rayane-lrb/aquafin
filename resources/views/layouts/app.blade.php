@@ -114,6 +114,10 @@
                     @endisset
                 </div>
 
+                @isset($topbar)
+                <div class="flex-1 mx-4 max-w-lg">{{ $topbar }}</div>
+                @endisset
+
                 <div class="flex items-center gap-2 sm:gap-4">
                     <div class="flex items-center gap-2 bg-gray-100 px-2 sm:px-3 py-1.5 rounded-full">
                         <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
