@@ -1,6 +1,179 @@
 <x-app-layout>
     <x-slot name="header">Producten</x-slot>
 
+    <x-slot name="topbar">
+        <form method="GET" action="{{ route('product.index') }}" class="flex items-center gap-2">
+            <div class="relative flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" value="{{ $query }}"
+                    placeholder="Zoek een product..."
+                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition">
+            </div>
+            @if ($query || $selectedCategory)
+                <a href="{{ route('product.index') }}" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1.5 rounded-lg border border-gray-200 transition whitespace-nowrap">
+                    ✕
+                </a>
+            @endif
+        </form>
+    </x-slot>
+
+    {{-- ══════════════════════════════════════════════════════════
+         NOTIFICATIES — zwevende kaart rechtsonder
+         ══════════════════════════════════════════════════════════ --}}
+
+    @php $role = auth()->user()?->role; @endphp
+
+    {{-- ── TECHNIEKER: statusupdates van bestellingen ── --}}
+    @if($role === 'technieker')
+    @php $unread = auth()->user()->unreadNotifications->take(5); @endphp
+    @if($unread->isNotEmpty())
+    <div id="notif-card" class="fixed bottom-6 right-6 z-50 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        {{-- Header --}}
+        <div class="flex items-center justify-between px-4 py-3 bg-blue-600">
+            <div class="flex items-center gap-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="text-sm font-semibold">Meldingen</span>
+                <span class="bg-white/30 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{{ $unread->count() }}</span>
+            </div>
+            <button onclick="sluitAlleNotifs()" class="text-white/70 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        {{-- Notificaties --}}
+        <div class="divide-y divide-gray-50 max-h-72 overflow-y-auto" id="notif-list">
+            @foreach($unread as $notif)
+            @php $d = $notif->data; $status = $d['status'] ?? ''; @endphp
+            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition" data-id="{{ $notif->id }}">
+                <div class="mt-0.5 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                    {{ $status === 'goedgekeurd' ? 'bg-green-100' : ($status === 'geleverd' ? 'bg-blue-100' : 'bg-red-100') }}">
+                    <span class="text-base">{{ $d['icon'] ?? '📦' }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-gray-800 leading-snug">{{ $d['message'] ?? '' }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
+                </div>
+                <button onclick="sluitNotif(this)" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            @endforeach
+        </div>
+        {{-- Footer --}}
+        <div class="px-4 py-2 border-t border-gray-100 bg-gray-50">
+            <a href="{{ route('order.index') }}" class="text-xs text-blue-600 hover:underline font-medium">Alle bestellingen bekijken →</a>
+        </div>
+    </div>
+    @endif
+    @endif
+
+    {{-- ── MAGAZIJNBEHEERDER: openstaande + urgente bestellingen ── --}}
+    @if($role === 'magazijnBeheerder' && ($pendingCount > 0 || $urgentCount > 0))
+    @php $unreadNotifs = auth()->user()->unreadNotifications->take(3); @endphp
+    <div id="notif-card-mag" style="display:none"
+         data-pending="{{ $pendingCount }}" data-urgent="{{ $urgentCount }}"
+         class="fixed bottom-6 right-6 z-50 w-80 bg-white rounded-2xl shadow-xl border {{ $urgentCount > 0 ? 'border-red-200' : 'border-gray-100' }} overflow-hidden">
+        {{-- Header --}}
+        <div class="flex items-center justify-between px-4 py-3 {{ $urgentCount > 0 ? 'bg-red-600' : 'bg-emerald-700' }}">
+            <div class="flex items-center gap-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="text-sm font-semibold">Bestellingen</span>
+            </div>
+            <button onclick="sluitMagNotif()" class="text-white/70 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        {{-- Inhoud --}}
+        <div class="divide-y divide-gray-50">
+            {{-- Pending --}}
+            <a href="{{ route('order.index') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
+                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-xs font-semibold text-gray-800">In behandeling</p>
+                    <p class="text-xs text-gray-400">{{ $pendingCount }} bestelling{{ $pendingCount !== 1 ? 'en' : '' }} wacht{{ $pendingCount === 1 ? '' : 'en' }} op goedkeuring</p>
+                </div>
+                <span class="text-sm font-bold text-yellow-600">{{ $pendingCount }}</span>
+            </a>
+            {{-- Urgent --}}
+            @if($urgentCount > 0)
+            <a href="{{ route('order.index') }}" class="flex items-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 transition">
+                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-40"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 relative" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-xs font-semibold text-red-700">🚨 DRINGEND</p>
+                    <p class="text-xs text-red-500">{{ $urgentCount }} urgente bestelling{{ $urgentCount !== 1 ? 'en' : '' }}</p>
+                </div>
+                <span class="text-sm font-bold text-red-600">{{ $urgentCount }}</span>
+            </a>
+            @endif
+            {{-- Nieuwe notifs (nieuwe bestellingen) --}}
+            @foreach($unreadNotifs as $notif)
+            @php $d = $notif->data; @endphp
+            <div class="flex items-start gap-3 px-4 py-3">
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-base">
+                    {{ $d['icon'] ?? '📦' }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-gray-800 leading-snug">{{ $d['message'] ?? '' }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ $notif->created_at->diffForHumans() }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        {{-- Footer --}}
+        <div class="px-4 py-2 border-t border-gray-100 bg-gray-50">
+            <a href="{{ route('order.index') }}" class="text-xs text-blue-600 hover:underline font-medium">Alle bestellingen beheren →</a>
+        </div>
+    </div>
+    @endif
+
+    {{-- ══ SUGGESTIES ══════════════════════════════════════════════ --}}
+    @if($showCategories && $suggestedProducts->isNotEmpty())
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-gray-700">{{ $suggestLabel }}</h2>
+            <span class="text-xs text-gray-400">{{ $suggestSub }}</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            @foreach($suggestedProducts as $sp)
+            <button type="button" onclick="openModal({{ $sp->id }})"
+                class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition p-3 flex flex-col items-center gap-2 text-left group">
+                @if($sp->image)
+                    <img src="{{ asset('storage/' . $sp->image) }}" class="w-14 h-14 object-cover rounded-xl" alt="{{ $sp->name }}">
+                @else
+                    <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                        </svg>
+                    </div>
+                @endif
+                <p class="text-xs font-semibold text-gray-700 text-center leading-tight group-hover:text-blue-700 transition line-clamp-2">{{ $sp->name }}</p>
+                <span class="text-xs text-gray-400">Stock: {{ $sp->stock }}</span>
+            </button>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     {{-- ══ FAVORIETEN — alleen op de startpagina ══════════════════ --}}
     @if ($showCategories && $favoriteProducts->isNotEmpty())
     <div class="mb-8">
@@ -54,22 +227,9 @@
 
     {{-- Toolbar --}}
     <form method="GET" action="{{ route('product.index') }}" class="mb-6 space-y-3">
-        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-center sm:justify-between">
-            <div class="flex gap-2 flex-1 min-w-0">
-                <input type="text" name="search" value="{{ $query }}"
-                    placeholder="Zoek een product..."
-                    class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
-                    Zoeken
-                </button>
-                @if ($query || $selectedCategory)
-                    <a href="{{ route('product.index') }}" class="text-sm text-gray-400 hover:text-gray-600 px-3 py-2 rounded-lg border border-gray-200 transition whitespace-nowrap">
-                        ✕ Reset
-                    </a>
-                @endif
-            </div>
+        <div class="flex justify-end">
             @if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'magazijnBeheerder')
-                <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap text-center w-full sm:w-auto">
+                <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
                     + Product toevoegen
                 </a>
             @endif
@@ -443,6 +603,94 @@ function addRecommended(productId) {
     .then(() => { closeModal(); showToast('Product toegevoegd aan het mandje!'); });
 }
 
+// ── Notificaties ────────────────────────────────────────────────────────
+
+// TECHNIEKER — mémorise les IDs fermés dans localStorage
+const DISMISSED_KEY = 'notif_dismissed_ids_{{ auth()->id() }}';
+
+function getDismissed() {
+    try { return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]'); } catch { return []; }
+}
+function saveDismissed(ids) {
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(ids));
+}
+
+function sluitNotif(btn) {
+    const item = btn.closest('.notif-item');
+    const id   = item.dataset.id;
+    fetch('/notifications/' + id + '/read', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    });
+    const dismissed = getDismissed();
+    dismissed.push(id);
+    saveDismissed(dismissed);
+    item.remove();
+    const list = document.getElementById('notif-list');
+    if (list && list.querySelectorAll('.notif-item').length === 0) {
+        document.getElementById('notif-card')?.remove();
+    }
+}
+
+function sluitAlleNotifs() {
+    fetch('/notifications/read-all', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    });
+    // Sauvegarder tous les IDs visibles
+    const items = document.querySelectorAll('#notif-card .notif-item');
+    const dismissed = getDismissed();
+    items.forEach(i => dismissed.push(i.dataset.id));
+    saveDismissed(dismissed);
+    document.getElementById('notif-card')?.remove();
+}
+
+// Filtrer les notifs déjà fermées au chargement
+document.addEventListener('DOMContentLoaded', function () {
+    const dismissed = getDismissed();
+    const card = document.getElementById('notif-card');
+    if (card) {
+        dismissed.forEach(id => {
+            document.querySelector(`.notif-item[data-id="${id}"]`)?.remove();
+        });
+        const list = document.getElementById('notif-list');
+        if (!list || list.querySelectorAll('.notif-item').length === 0) {
+            card.remove();
+        }
+        // Sinon afficher la carte
+    }
+
+    // MAG — afficher seulement si nouveau ou pas encore fermé
+    const magCard = document.getElementById('notif-card-mag');
+    if (magCard) {
+        const MAG_KEY = 'mag_notif_{{ auth()->id() }}';
+        const currentPending = parseInt(magCard.dataset.pending || '0');
+        const currentUrgent  = parseInt(magCard.dataset.urgent  || '0');
+        let show = true;
+        try {
+            const saved = JSON.parse(localStorage.getItem(MAG_KEY) || 'null');
+            if (saved) {
+                const age = Date.now() - saved.at;
+                const sameOrLess = currentPending <= saved.pending && currentUrgent <= saved.urgent;
+                // Cacher si fermé il y a moins de 30 min ET pas de nouvelles commandes
+                if (age < 30 * 60 * 1000 && sameOrLess) show = false;
+            }
+        } catch {}
+        if (show) magCard.style.display = '';
+    }
+});
+
+function sluitMagNotif() {
+    const magCard = document.getElementById('notif-card-mag');
+    if (!magCard) return;
+    const MAG_KEY = 'mag_notif_{{ auth()->id() }}';
+    localStorage.setItem(MAG_KEY, JSON.stringify({
+        at:      Date.now(),
+        pending: parseInt(magCard.dataset.pending || '0'),
+        urgent:  parseInt(magCard.dataset.urgent  || '0'),
+    }));
+    magCard.remove();
+}
 
 </script>
 
