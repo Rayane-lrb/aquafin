@@ -112,7 +112,8 @@
              data-has-urgent="{{ $hasUrgent ? '1' : '0' }}">
 
             {{-- Groep header --}}
-            <div class="group-header flex items-center gap-3 mb-2 px-1">
+            <button type="button" onclick="toggleGroup(this)"
+                class="group-header w-full flex items-center gap-3 mb-2 px-1 cursor-pointer select-none">
                 <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
                     {{ strtoupper(substr($firstOrder->user->name ?? '?', 0, 1)) }}
                 </div>
@@ -123,7 +124,10 @@
                 @else
                     <span class="group-urgent-badge hidden ml-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">🚨 DRINGEND</span>
                 @endif
-            </div>
+                <svg class="collapse-arrow ml-auto w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
 
             {{-- Tabel --}}
             <div class="bg-white shadow-sm rounded-xl overflow-x-auto">
@@ -272,6 +276,17 @@
     @endif
 
 <script>
+/* ===================================================
+   Groep collapse/expand
+   =================================================== */
+function toggleGroup(btn) {
+    const group  = btn.closest('.user-group');
+    const table  = group.querySelector('.bg-white');
+    const arrow  = btn.querySelector('.collapse-arrow');
+    const hidden = table.classList.toggle('hidden');
+    arrow.style.transform = hidden ? 'rotate(-90deg)' : '';
+}
+
 /* ===================================================
    Tab filter — client-side, geen page reload
    =================================================== */
