@@ -2,7 +2,7 @@
     <x-slot name="header">Neerslag</x-slot>
 
     {{-- Locatiekiezer --}}
-    @if (isset($warehouses) && $warehouses->count() > 1)
+    @if (isset($warehouses) && $warehouses->count() >= 1)
     <form method="GET" action="{{ route('neerslag.index') }}" class="mb-5">
         <div class="flex items-center gap-3">
             <label class="text-sm font-medium text-gray-600 whitespace-nowrap">📍 Locatie:</label>

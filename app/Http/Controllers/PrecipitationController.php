@@ -14,7 +14,7 @@ class PrecipitationController extends Controller
     public function index(Request $request)
     {
         $user       = auth()->user();
-        $warehouses = Warehouse::whereNotNull('latitude')->whereNotNull('longitude')->get();
+        $warehouses = Warehouse::all();
 
         // Warehouse choisi : paramètre GET → session → warehouse par défaut → premier avec coords
         if ($request->has('warehouse_id')) {
@@ -167,7 +167,7 @@ class PrecipitationController extends Controller
             }
 
         } catch (\Exception $e) {
-            return view('neerslag.index', ['error' => 'Fout: '.$e->getMessage()]);
+            return view('neerslag.index', ['error' => 'Fout: '.$e->getMessage(), 'warehouses' => $warehouses, 'warehouse' => $warehouse]);
         }
 
         return view('neerslag.index', compact(
