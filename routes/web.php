@@ -114,5 +114,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::post('/cart/ajax/{product}', [CartController::class, 'ajaxUpdate'])->middleware('auth')->name('cart.ajax');
 Route::post('/favorites/{product}', [FavoriteController::class, 'toggle'])->middleware('auth')->name('favorites.toggle');
 Route::post('/notifications/read-all', fn () => auth()->user()->unreadNotifications->markAsRead())->middleware('auth')->name('notifications.readAll');
+Route::post('/notifications/{id}/read', function ($id) {
+    $notif = auth()->user()->unreadNotifications->where('id', $id)->first();
+    if ($notif) $notif->markAsRead();
+    return response()->noContent();
+})->middleware('auth')->name('notifications.read');
 
 require __DIR__.'/auth.php';
