@@ -49,14 +49,14 @@
     <div class="flex flex-wrap gap-3 mb-8">
         @if($urgentCount > 0)
         <div class="flex items-center gap-2 bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow animate-pulse">
-            🚨 {{ $urgentCount }} DRINGEND{{ $urgentCount > 1 ? 'E' : '' }}
+            {{ $urgentCount }} DRINGEND{{ $urgentCount > 1 ? 'E' : '' }}
         </div>
         @endif
         <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm font-medium px-4 py-2 rounded-xl">
-            ⏳ {{ $pendingCount }} te beslissen
+            {{ $pendingCount }} te beslissen
         </div>
         <div class="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium px-4 py-2 rounded-xl">
-            📦 {{ $approvedCount }} te leveren
+            {{ $approvedCount }} te leveren
         </div>
         <div class="ml-auto">
             <a href="{{ route('order.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
@@ -66,11 +66,11 @@
     </div>
 
     {{-- ══════════════════════════════════════════
-         SECTIE 1 : ⏳ TE BESLISSEN
+         SECTIE 1 : TE BESLISSEN
     ══════════════════════════════════════════ --}}
     <div class="mb-8">
         <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
-            ⏳ Te beslissen — {{ $pendingCount }} dossier{{ $pendingCount !== 1 ? 's' : '' }}
+            Te beslissen — {{ $pendingCount }} dossier{{ $pendingCount !== 1 ? 's' : '' }}
         </h2>
 
         @forelse ($pendingGroups as $groupId => $items)
@@ -86,21 +86,28 @@
                 {{-- Bannière urgent --}}
                 @if($urgent)
                     <div class="bg-red-600 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-                        🚨 DRINGENDE BESTELLING — voorrangsbehandeling vereist
+                        DRINGENDE BESTELLING — voorrangsbehandeling vereist
                     </div>
                 @endif
 
                 {{-- Header dossier --}}
                 <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 {{ $urgent ? 'bg-red-50' : 'bg-gray-50' }}">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
                         <div class="w-8 h-8 rounded-full {{ $urgent ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600' }} flex items-center justify-center font-bold text-sm shrink-0">
                             {{ strtoupper(substr($first->user->name ?? '?', 0, 1)) }}
                         </div>
-                        <div>
-                            <span class="font-semibold text-sm text-gray-900">{{ $first->user->name ?? '—' }}</span>
-                            <span class="text-gray-400 text-xs ml-2">{{ $first->created_at->format('d/m/Y H:i') }}</span>
+                        <div class="flex-1 min-w-0 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                            <div>
+                                <span class="font-semibold text-sm text-gray-900">{{ $first->user->name ?? '—' }}</span>
+                                <span class="text-gray-400 text-xs ml-2">{{ $first->created_at->format('d/m/Y H:i') }}</span>
+                            </div>
                             @if($first->warehouse)
-                                <span class="text-gray-400 text-xs ml-2">· {{ $first->warehouse->name }}</span>
+                                <div class="text-right">
+                                    <p class="text-base font-extrabold text-gray-900 leading-tight">{{ $first->warehouse->name }}</p>
+                                    @if($first->warehouse->address)
+                                        <p class="text-xs text-gray-500">{{ $first->warehouse->address }}</p>
+                                    @endif
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -152,11 +159,11 @@
                 {{-- Leverdatum instellen --}}
                 @if($canGroup)
                 <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 flex items-center gap-3">
-                    <span class="text-xs text-gray-500">📅 Leverdatum:</span>
+                    <span class="text-xs text-gray-500">Leverdatum:</span>
                     <form action="{{ route('order.group.deliveryDate', $groupId) }}" method="POST" class="flex items-center gap-2">
                         @csrf @method('PATCH')
                         <input type="date" name="delivery_date"
-                            value="{{ $first->delivery_date ?? '' }}"
+                            value="{{ $first->delivery_date ?? ($urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d')) }}"
                             min="{{ date('Y-m-d') }}"
                             class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
                         <button type="submit" class="text-xs font-medium text-blue-600 hover:underline">Opslaan</button>
@@ -175,11 +182,11 @@
     </div>
 
     {{-- ══════════════════════════════════════════
-         SECTIE 2 : 📦 TE LEVEREN
+         SECTIE 2 : TE LEVEREN
     ══════════════════════════════════════════ --}}
     <div class="mb-8">
         <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
-            📦 Te leveren — {{ $approvedCount }} dossier{{ $approvedCount !== 1 ? 's' : '' }}
+            Te leveren — {{ $approvedCount }} dossier{{ $approvedCount !== 1 ? 's' : '' }}
         </h2>
 
         @forelse ($approvedGroups as $groupId => $items)
@@ -193,28 +200,35 @@
 
                 @if($urgent)
                     <div class="bg-red-600 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-                        🚨 DRINGEND
+                        DRINGEND
                     </div>
                 @endif
 
                 <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 {{ $urgent ? 'bg-red-50' : 'bg-blue-50' }}">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
                         <div class="w-8 h-8 rounded-full {{ $urgent ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600' }} flex items-center justify-center font-bold text-sm shrink-0">
                             {{ strtoupper(substr($first->user->name ?? '?', 0, 1)) }}
                         </div>
-                        <div>
-                            <span class="font-semibold text-sm text-gray-900">{{ $first->user->name ?? '—' }}</span>
+                        <div class="flex-1 min-w-0 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                            <div>
+                                <span class="font-semibold text-sm text-gray-900">{{ $first->user->name ?? '—' }}</span>
+                                @if($first->delivery_date)
+                                    @php $daysLeft = now()->diffInDays(\Carbon\Carbon::parse($first->delivery_date), false); @endphp
+                                    <span class="ml-2 text-xs font-semibold {{ $daysLeft <= 1 ? 'text-red-600' : ($daysLeft <= 3 ? 'text-orange-500' : 'text-green-600') }}">
+                                        {{ \Carbon\Carbon::parse($first->delivery_date)->format('d/m/Y') }}
+                                        @if($daysLeft < 0) (te laat!) @elseif($daysLeft === 0) (vandaag!) @elseif($daysLeft === 1) (morgen) @endif
+                                    </span>
+                                @else
+                                    <span class="ml-2 text-xs text-gray-400 italic">geen datum</span>
+                                @endif
+                            </div>
                             @if($first->warehouse)
-                                <span class="text-gray-500 text-xs ml-2">→ {{ $first->warehouse->name }}</span>
-                            @endif
-                            @if($first->delivery_date)
-                                @php $daysLeft = now()->diffInDays(\Carbon\Carbon::parse($first->delivery_date), false); @endphp
-                                <span class="ml-2 text-xs font-semibold {{ $daysLeft <= 1 ? 'text-red-600' : ($daysLeft <= 3 ? 'text-orange-500' : 'text-green-600') }}">
-                                    📅 {{ \Carbon\Carbon::parse($first->delivery_date)->format('d/m/Y') }}
-                                    @if($daysLeft < 0) (te laat!) @elseif($daysLeft === 0) (vandaag!) @elseif($daysLeft === 1) (morgen) @endif
-                                </span>
-                            @else
-                                <span class="ml-2 text-xs text-gray-400 italic">geen datum</span>
+                                <div class="text-right">
+                                    <p class="text-base font-extrabold text-gray-900 leading-tight">{{ $first->warehouse->name }}</p>
+                                    @if($first->warehouse->address)
+                                        <p class="text-xs text-gray-500">{{ $first->warehouse->address }}</p>
+                                    @endif
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -225,20 +239,10 @@
                         <form action="{{ route('order.group.deliveryDate', $groupId) }}" method="POST" class="flex items-center gap-1.5">
                             @csrf @method('PATCH')
                             <input type="date" name="delivery_date"
-                                value="{{ $first->delivery_date ?? '' }}"
+                                value="{{ $first->delivery_date ?? ($urgent ? now()->format('Y-m-d') : now()->addDay()->format('Y-m-d')) }}"
                                 min="{{ date('Y-m-d') }}"
                                 class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            <button type="submit" class="text-xs text-blue-600 hover:underline font-medium">📅</button>
-                        </form>
-                        @endif
-
-                        {{-- Afleveren --}}
-                        @if(!$isSolo)
-                        <form action="{{ route('order.group.deliver', $groupId) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button class="text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg transition">
-                                ✓ Afgeleverd
-                            </button>
+                            <button type="submit" class="text-xs text-blue-600 hover:underline font-medium">Opslaan</button>
                         </form>
                         @endif
                     </div>
@@ -281,26 +285,35 @@
 
         <div id="archive" class="hidden space-y-3">
             @forelse ($archiveGroups as $groupId => $items)
-                @php $first = $items->first(); @endphp
-                <div class="rounded-xl border border-gray-200 overflow-hidden opacity-70">
-                    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-gray-50">
-                        <div>
+                @php
+                    $first        = $items->first();
+                    $allDelivered = $items->every(fn($o) => $o->status === 'geleverd');
+                    $archiveId    = 'arch-' . $loop->index;
+                @endphp
+                <div class="rounded-xl border border-gray-200 overflow-hidden opacity-75">
+                    {{-- Header klikbaar --}}
+                    <button type="button"
+                        onclick="toggleArchiveGroup('{{ $archiveId }}')"
+                        class="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 transition text-left">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-medium text-gray-700">{{ $first->user->name ?? '—' }}</span>
-                            <span class="text-xs text-gray-400 ml-2">{{ $first->created_at->format('d/m/Y') }}</span>
+                            <span class="text-xs text-gray-400">{{ $first->created_at->format('d/m/Y') }}</span>
                             @if($first->warehouse)
-                                <span class="text-xs text-gray-400 ml-2">· {{ $first->warehouse->name }}</span>
+                                <span class="text-xs text-gray-400">· {{ $first->warehouse->name }}</span>
+                            @endif
+                            @if($allDelivered)
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">✓ Geleverd</span>
+                            @else
+                                <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">✗ Afgekeurd</span>
                             @endif
                         </div>
-                        @php
-                            $allDelivered = $items->every(fn($o) => $o->status === 'geleverd');
-                        @endphp
-                        @if($allDelivered)
-                            <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">✓ Geleverd</span>
-                        @else
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">✗ Afgekeurd</span>
-                        @endif
-                    </div>
-                    <div class="bg-white divide-y divide-gray-100">
+                        <svg id="{{ $archiveId }}-arrow" class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 rotate-[-90deg]"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    {{-- Inhoud — standaard verborgen --}}
+                    <div id="{{ $archiveId }}" class="hidden bg-white divide-y divide-gray-100">
                         @foreach($items as $order)
                         <div class="flex items-center justify-between px-4 py-2 gap-4">
                             <span class="text-sm text-gray-600">{{ $order->product->name ?? '—' }}</span>
@@ -308,10 +321,13 @@
                                 <span class="font-mono text-xs text-gray-400">{{ $order->product->barcode }}</span>
                             @endif
                             <span class="text-sm text-gray-500">× {{ $order->quantity }}</span>
+                            @if($order->delivery_date)
+                                <span class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($order->delivery_date)->format('d/m/Y') }}</span>
+                            @endif
                             @if($order->status === 'geleverd')
-                                <span class="text-xs text-emerald-600">✓</span>
+                                <span class="text-xs text-emerald-600 font-semibold">✓</span>
                             @else
-                                <span class="text-xs text-red-500">✗</span>
+                                <span class="text-xs text-red-500 font-semibold">✗</span>
                             @endif
                         </div>
                         @endforeach
@@ -322,5 +338,14 @@
             @endforelse
         </div>
     </div>
+
+<script>
+function toggleArchiveGroup(id) {
+    const body  = document.getElementById(id);
+    const arrow = document.getElementById(id + '-arrow');
+    const hidden = body.classList.toggle('hidden');
+    arrow.style.transform = hidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+</script>
 
 </x-app-layout>
