@@ -38,10 +38,10 @@
        style="background: linear-gradient(180deg, {{ $theme['from'] }} 0%, {{ $theme['to'] }} 100%);">
 
     {{-- Logo & titel --}}
-    <div class="px-5 py-5 flex items-center gap-3" style="border-bottom: 1px solid {{ $theme['border'] }}20;">
+    <a href="{{ route('product.index') }}" class="px-5 py-5 flex items-center gap-3" style="border-bottom: 1px solid {{ $theme['border'] }}20;">
         <img src="{{ asset('images/aquafinlogo.png') }}" alt="Aquafin" class="h-8 w-auto flex-shrink-0">
         <p class="text-xs truncate" style="color: {{ $theme['muted'] }}">{{ $roleLabel }}</p>
-    </div>
+    </a>
 
     {{-- Navigatie --}}
     <nav class="flex-1 px-3 py-4 overflow-y-auto space-y-0.5">
