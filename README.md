@@ -105,6 +105,13 @@ php artisan test --compact
 | `suggestions` | Productvoorstellen van technici |
 | `notifications` | Laravel databasemeldingen |
 
+##Javadoc
+
+om het javadoc te bekijken
+```bash
+Start-Process ".\docs\api\index.html"
+```
+
 ## Projectstructuur
 
 ```
